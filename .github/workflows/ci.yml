@@ -14,8 +14,8 @@ jobs:
     name: Firmware build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: '3.12'
           cache: pip
@@ -26,7 +26,7 @@ jobs:
       - name: Enforce OTA slot budget
         run: |
           test $(stat -c%s .pio/build/esp32dev/firmware.bin) -lt $((0x1C0000))
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: firmware-ci
           path: |
@@ -41,8 +41,8 @@ jobs:
       run:
         working-directory: website
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: npm
@@ -51,7 +51,7 @@ jobs:
       - run: npm run typecheck
       - run: npm run format:check
       - run: npm run build
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: website-ci
           path: website/dist
@@ -60,7 +60,7 @@ jobs:
     name: Repository policy
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Required files
         run: |
           test -f README.md
