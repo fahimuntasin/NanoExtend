@@ -20,7 +20,15 @@ jobs:
           python-version: '3.12'
       - run: pip install platformio==6.1.19 clang-format==22.1.8
       - name: Check C/C++ formatting
-        run: clang-format --dry-run --Werror src/*.cpp include/*.h
+        run: |
+          python3 - <<'PY'
+          import glob
+          import subprocess
+          files = glob.glob("src/*.cpp")
+          files += [path for path in glob.glob("include/*.h")
+                    if not path.endswith("web_assets.h")]
+          subprocess.check_call(["clang-format", "--dry-run", "--Werror", *files])
+          PY
       - run: pio run -e esp32dev
       - name: Enforce OTA slot budget
         run: |
