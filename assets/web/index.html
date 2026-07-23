@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<title>NanoExtend</title>
+<link rel="stylesheet" href="/app.css"/>
+</head>
+<body>
+<div id="app">
+  <header class="top">
+    <div>
+      <div class="brand">NanoExtend</div>
+      <div class="sub" id="hdrState">Booting…</div>
+    </div>
+    <div class="pill" id="hdrNet">—</div>
+  </header>
+
+  <nav class="tabs">
+    <button data-tab="home" class="active">Home</button>
+    <button data-tab="scan">Scan</button>
+    <button data-tab="clients">Clients</button>
+    <button data-tab="settings">Settings</button>
+    <button data-tab="system">System</button>
+    <button data-tab="ota">OTA</button>
+    <button data-tab="logs">Logs</button>
+  </nav>
+
+  <main>
+    <section id="tab-home" class="tab active">
+      <div class="grid">
+        <div class="card"><div class="label">Connection</div><div class="value" id="stState">—</div></div>
+        <div class="card"><div class="label">Upstream SSID</div><div class="value" id="stSsid">—</div></div>
+        <div class="card"><div class="label">RSSI</div><div class="value" id="stRssi">—</div><canvas id="gRssi" width="280" height="64"></canvas></div>
+        <div class="card"><div class="label">STA IP</div><div class="value" id="stIp">—</div></div>
+        <div class="card"><div class="label">Gateway</div><div class="value" id="stGw">—</div></div>
+        <div class="card"><div class="label">DNS</div><div class="value" id="stDns">—</div></div>
+        <div class="card"><div class="label">NAT / Sharing</div><div class="value" id="stNat">—</div></div>
+        <div class="card"><div class="label">Internet</div><div class="value" id="stInet">—</div></div>
+        <div class="card"><div class="label">Clients</div><div class="value" id="stClients">—</div></div>
+        <div class="card"><div class="label">Uptime</div><div class="value" id="stUp">—</div></div>
+        <div class="card"><div class="label">Free Heap</div><div class="value" id="stHeap">—</div><canvas id="gHeap" width="280" height="64"></canvas></div>
+        <div class="card"><div class="label">Reconnects</div><div class="value" id="stRe">—</div></div>
+        <div class="card wide"><div class="label">Last Error</div><div class="value small" id="stErr">none</div></div>
+      </div>
+      <div class="row">
+        <button class="btn" id="btnScan">Scan</button>
+        <button class="btn" id="btnDisconnect">Disconnect</button>
+        <button class="btn danger" id="btnReboot">Restart</button>
+      </div>
+    </section>
+
+    <section id="tab-scan" class="tab">
+      <div class="row">
+        <button class="btn" id="btnRefreshScan">Refresh</button>
+        <span class="muted" id="scanMeta">cache 15s</span>
+      </div>
+      <div id="scanList" class="list"></div>
+    </section>
+
+    <section id="tab-clients" class="tab">
+      <div id="clientList" class="list"></div>
+    </section>
+
+    <section id="tab-settings" class="tab">
+      <form id="settingsForm" class="form">
+        <label>AP Name<input name="apSsid" maxlength="32" required/></label>
+        <label>AP Password<input name="apPass" type="password" minlength="8" maxlength="63" required/></label>
+        <label>Device Name<input name="deviceName" maxlength="32" required/></label>
+        <label>Hostname<input name="hostname" maxlength="32" required/></label>
+        <button class="btn" type="submit">Save</button>
+      </form>
+      <div class="card" style="margin-top:16px;max-width:420px">
+        <div class="label">Settings Backup</div>
+        <p class="muted">Backup contains Wi-Fi credentials. Store it securely.</p>
+        <div class="row">
+          <button class="btn" id="btnBackup">Download</button>
+          <input type="file" id="restoreFile" accept=".json,application/json"/>
+          <button class="btn ghost" id="btnRestore">Restore</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="tab-system" class="tab">
+      <div class="grid">
+        <div class="card"><div class="label">Firmware</div><div class="value" id="sysFw">—</div></div>
+        <div class="card"><div class="label">SDK</div><div class="value small" id="sysSdk">—</div></div>
+        <div class="card"><div class="label">CPU</div><div class="value" id="sysCpu">—</div></div>
+        <div class="card"><div class="label">Flash</div><div class="value small" id="sysFlash">—</div></div>
+        <div class="card"><div class="label">Reset</div><div class="value" id="sysReset">—</div></div>
+        <div class="card"><div class="label">Crash</div><div class="value small" id="sysCrash">—</div></div>
+        <div class="card"><div class="label">Health</div><div class="value small" id="sysHealth">—</div></div>
+      </div>
+      <div class="row">
+        <button class="btn danger" id="btnFactory">Factory Reset</button>
+      </div>
+    </section>
+
+    <section id="tab-ota" class="tab">
+      <div class="card">
+        <div class="label">Firmware Update</div>
+        <div class="value small" id="updateCurrent">Current version —</div>
+        <div class="row">
+          <input id="updateServer" value="https://nanoextend.pages.dev/firmware/manifest.json" aria-label="Update manifest URL"/>
+          <button class="btn ghost" id="btnCheckUpdate">Check</button>
+        </div>
+        <div class="card hidden" id="remoteUpdateCard" style="margin-top:12px">
+          <div class="label">Update available</div>
+          <div class="value" id="remoteVersion">—</div>
+          <p class="muted" id="remoteNotes"></p>
+          <button class="btn" id="btnRemoteUpdate">Download and install</button>
+        </div>
+        <div class="label" style="margin-top:20px">Manual update</div>
+        <input type="file" id="otaFile" accept=".bin"/>
+        <div class="bar"><div id="otaBar"></div></div>
+        <div class="muted" id="otaStatus">idle</div>
+        <div class="muted" id="otaHash"></div>
+        <button class="btn" id="btnOta">Upload</button>
+      </div>
+    </section>
+
+    <section id="tab-logs" class="tab">
+      <div class="row">
+        <button class="btn" id="btnLogs">Refresh</button>
+        <a class="btn" id="btnExport" href="/api/v1/logs?export=1">Export</a>
+      </div>
+      <pre id="logView" class="logs"></pre>
+    </section>
+  </main>
+</div>
+
+<div id="modal" class="modal hidden">
+  <div class="modal-card">
+    <div class="label">Connect</div>
+    <div id="modalSsid" class="value"></div>
+    <input id="modalPass" type="password" placeholder="Password" minlength="8" maxlength="63"/>
+    <div class="row">
+      <button class="btn" id="modalConnect">Connect</button>
+      <button class="btn ghost" id="modalClose">Cancel</button>
+    </div>
+    <div class="muted" id="modalStatus"></div>
+  </div>
+</div>
+
+<script src="/app.js"></script>
+</body>
+</html>

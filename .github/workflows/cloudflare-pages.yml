@@ -1,0 +1,68 @@
+name: Cloudflare Pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'website/**'
+      - 'docs/**'
+      - 'api/**'
+      - '.github/workflows/cloudflare-pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install platformio==6.1.19
+      - name: Build installer firmware
+        run: |
+          pio run -e esp32dev
+          VERSION=$(python3 -c 'import re; print(re.search(r"define NANOEXTEND_FW_VERSION \"([^\"]+)\"", open("include/version.h").read()).group(1))')
+          mkdir -p website/public/firmware
+          cp .pio/build/esp32dev/firmware.factory.bin "website/public/firmware/nanoextend-${VERSION}.factory.bin"
+          cp .pio/build/esp32dev/firmware.bin "website/public/firmware/nanoextend-${VERSION}.ota.bin"
+          python3 - "$VERSION" <<'PY'
+          import hashlib, json, pathlib, sys
+          version=sys.argv[1]
+          def image(kind):
+              path=pathlib.Path(f"website/public/firmware/nanoextend-{version}.{kind}.bin")
+              data=path.read_bytes()
+              return {"file":f"/firmware/{path.name}","size":len(data),
+                      "sha256":hashlib.sha256(data).hexdigest()}
+          factory=image("factory")
+          ota=image("ota")
+          manifest={"project":"NanoExtend","version":version,"channel":"stable",
+                    "file":factory["file"],"size":factory["size"],
+                    "sha256":factory["sha256"],"factory":factory,"ota":ota,
+                    "chip":"ESP32","flashSize":"4MB"}
+          pathlib.Path("website/public/firmware/manifest.json").write_text(
+              json.dumps(manifest, indent=2)+"\n")
+          PY
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: website/package-lock.json
+      - run: npm ci
+        working-directory: website
+      - name: Copy API and documentation assets
+        run: |
+          mkdir -p website/public/api website/public/docs
+          cp api/openapi.yaml website/public/api/openapi.yaml
+          cp -R docs/. website/public/docs/
+      - run: npm run build
+        working-directory: website
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy website/dist --project-name=${{ vars.CLOUDFLARE_PROJECT_NAME || 'nanoextend' }} --branch=${{ github.ref_name }}

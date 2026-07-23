@@ -1,0 +1,30 @@
+name-template: 'v$RESOLVED_VERSION'
+tag-template: 'v$RESOLVED_VERSION'
+categories:
+  - title: 'Features'
+    labels: [enhancement, feature]
+  - title: 'Fixes'
+    labels: [bug, fix]
+  - title: 'Documentation'
+    labels: [documentation]
+  - title: 'Maintenance'
+    labels: [ci, dependencies, maintenance]
+change-template: '- $TITLE @$AUTHOR (#$NUMBER)'
+change-title-escapes: '\<*_&'
+version-resolver:
+  major:
+    labels: [major, breaking]
+  minor:
+    labels: [minor, enhancement, feature]
+  patch:
+    labels: [patch, bug, fix, dependencies]
+  default: patch
+template: |
+  ## What changed
+
+  $CHANGES
+
+  ## Install
+
+  Use the browser installer for first-time setup or the `.ota.bin` asset from
+  the local NanoExtend dashboard.

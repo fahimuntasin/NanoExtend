@@ -1,0 +1,29 @@
+name: Feature request
+description: Propose a focused improvement
+title: "feature: "
+labels: [enhancement, needs-triage]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What user problem should NanoExtend solve?
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives and trade-offs
+  - type: dropdown
+    id: cost
+    attributes:
+      label: Expected device cost
+      options: [Negligible, RAM, Flash, CPU, Network reliability, Unknown]
+    validations:
+      required: true

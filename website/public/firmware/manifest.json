@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "project": "NanoExtend",
+  "version": "1.0.0",
+  "channel": "stable",
+  "file": "/firmware/nanoextend-1.0.0.factory.bin",
+  "size": 1281920,
+  "sha256": "0476d792ad9977044d3b7e084b2c9332f5d8b39c014294b0f0ff8196630c5375",
+  "factory": {
+    "file": "/firmware/nanoextend-1.0.0.factory.bin",
+    "size": 1281920,
+    "sha256": "0476d792ad9977044d3b7e084b2c9332f5d8b39c014294b0f0ff8196630c5375"
+  },
+  "ota": {
+    "file": "/firmware/nanoextend-1.0.0.ota.bin",
+    "size": 1216384,
+    "sha256": "51f2d4e27913442b06e63ea99539d813e10d20a159e8e3db324955e493747c47"
+  },
+  "chip": "ESP32",
+  "flashSize": "4MB",
+  "releaseNotes": "Initial production release with NAT routing, captive portal, realtime dashboard, verified OTA, backup/restore, and recovery."
+}

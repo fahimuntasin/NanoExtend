@@ -1,0 +1,173 @@
+openapi: 3.1.0
+info:
+  title: NanoExtend Device API
+  version: 1.0.0
+  description: Local management API for the NanoExtend ESP32 NAT router.
+  license:
+    name: MIT
+    identifier: MIT
+servers:
+  - url: http://192.168.4.1/api/v1
+    description: NanoExtend SoftAP
+security:
+  - session: []
+    csrf: []
+paths:
+  /status:
+    get:
+      operationId: getStatus
+      summary: Device, Wi-Fi, health, and OTA status
+      security: []
+      responses:
+        "200":
+          description: Current status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Status"
+  /scan:
+    get:
+      operationId: scanNetworks
+      summary: Return cached networks and optionally start an async refresh
+      parameters:
+        - in: query
+          name: refresh
+          schema: { type: boolean }
+      responses:
+        "200": { description: Scan state and networks }
+        "409": { $ref: "#/components/responses/Busy" }
+  /clients:
+    get:
+      operationId: getClients
+      summary: List SoftAP clients
+      responses:
+        "200": { description: Connected clients }
+  /connect:
+    post:
+      operationId: connectUpstream
+      summary: Save credentials and connect STA
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [ssid, password]
+              properties:
+                ssid: { type: string, minLength: 1, maxLength: 32 }
+                password: { type: string, minLength: 8, maxLength: 63 }
+      responses:
+        "200": { description: Connection requested }
+        "400": { $ref: "#/components/responses/Error" }
+  /disconnect:
+    post:
+      operationId: disconnectUpstream
+      summary: Disconnect STA and disable NAPT
+      responses:
+        "200": { description: Disconnected }
+  /settings:
+    get:
+      operationId: getSettings
+      summary: Get safe device/AP settings
+      responses:
+        "200": { description: Settings; STA password is never returned }
+    post:
+      operationId: updateSettings
+      summary: Validate and update AP/device settings
+      responses:
+        "200": { description: Saved }
+  /settings/backup:
+    get:
+      operationId: backupSettings
+      summary: Download a sensitive settings backup
+      responses:
+        "200":
+          description: NanoExtend settings backup including credentials
+          headers:
+            Cache-Control: { schema: { type: string } }
+  /settings/restore:
+    post:
+      operationId: restoreSettings
+      summary: Validate and restore a versioned settings backup
+      responses:
+        "200": { description: Restored; restart required }
+        "400": { $ref: "#/components/responses/Error" }
+  /logs:
+    get:
+      operationId: getLogs
+      summary: Return or export the bounded redacted RAM log
+      responses:
+        "200": { description: Logs }
+  /update:
+    post:
+      operationId: uploadFirmware
+      summary: Stream a dual-slot OTA application image
+      parameters:
+        - in: header
+          name: X-File-Size
+          required: true
+          schema: { type: integer, minimum: 1 }
+        - in: header
+          name: X-SHA256
+          required: true
+          schema: { type: string, pattern: "^[a-fA-F0-9]{64}$" }
+      requestBody:
+        required: true
+        content:
+          application/octet-stream:
+            schema: { type: string, contentMediaType: application/octet-stream }
+      responses:
+        "200": { description: Image verified and accepted }
+        "400": { $ref: "#/components/responses/Error" }
+  /reboot:
+    post:
+      operationId: reboot
+      summary: Reboot the device
+      responses:
+        "200": { description: Reboot scheduled }
+  /reset:
+    post:
+      operationId: factoryReset
+      summary: Erase NanoExtend settings and reboot
+      responses:
+        "200": { description: Reset scheduled }
+components:
+  securitySchemes:
+    session:
+      type: apiKey
+      in: header
+      name: X-Session
+    csrf:
+      type: apiKey
+      in: header
+      name: X-CSRF-Token
+  responses:
+    Error:
+      description: Request failed
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+    Busy:
+      description: Another exclusive operation is active
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+  schemas:
+    Error:
+      type: object
+      required: [ok, error]
+      properties:
+        ok: { const: false }
+        error: { type: string }
+    Status:
+      type: object
+      required: [ok, wifi, system, ota]
+      properties:
+        ok: { const: true }
+        csrf: { type: string }
+        session: { type: string }
+        wifi: { type: object, additionalProperties: true }
+        system: { type: object, additionalProperties: true }
+        ota: { type: object, additionalProperties: true }
+
+webhooks: {}
