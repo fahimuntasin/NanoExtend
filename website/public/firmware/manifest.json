@@ -1,22 +1,22 @@
 {
   "schema": 1,
   "project": "NanoExtend",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "channel": "stable",
-  "file": "/firmware/nanoextend-1.0.0.factory.bin",
-  "size": 1281920,
-  "sha256": "0476d792ad9977044d3b7e084b2c9332f5d8b39c014294b0f0ff8196630c5375",
+  "file": "/firmware/nanoextend-1.0.1.factory.bin",
+  "size": 1281952,
+  "sha256": "9bb3cfe966b06678c7a9cc6eb3e157ded3c28438d6cb4aa742f6ff0178f9c85b",
   "factory": {
-    "file": "/firmware/nanoextend-1.0.0.factory.bin",
-    "size": 1281920,
-    "sha256": "0476d792ad9977044d3b7e084b2c9332f5d8b39c014294b0f0ff8196630c5375"
+    "file": "/firmware/nanoextend-1.0.1.factory.bin",
+    "size": 1281952,
+    "sha256": "9bb3cfe966b06678c7a9cc6eb3e157ded3c28438d6cb4aa742f6ff0178f9c85b"
   },
   "ota": {
-    "file": "/firmware/nanoextend-1.0.0.ota.bin",
-    "size": 1216384,
-    "sha256": "51f2d4e27913442b06e63ea99539d813e10d20a159e8e3db324955e493747c47"
+    "file": "/firmware/nanoextend-1.0.1.ota.bin",
+    "size": 1216416,
+    "sha256": "5e7e22d5a51f7cd750d6529865556c2fdad0351125d417552626335c7c59f6a6"
   },
   "chip": "ESP32",
   "flashSize": "4MB",
-  "releaseNotes": "Initial production release with NAT routing, captive portal, realtime dashboard, verified OTA, backup/restore, and recovery."
+  "releaseNotes": "Uses GitHub Releases as the working default OTA update server and updates CI actions."
 }

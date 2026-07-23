@@ -284,7 +284,7 @@
     }
   };
   $('#updateServer').value = localStorage.getItem('ne_update_server') ||
-    'https://nanoextend.pages.dev/firmware/manifest.json';
+    'https://github.com/fahimuntasin/NanoExtend/releases/latest/download/manifest.json';
   $('#btnCheckUpdate').onclick = () => checkForUpdate(true);
   $('#btnRemoteUpdate').onclick = async () => {
     if (!remoteManifest?.ota) return alert('Check for updates first');
