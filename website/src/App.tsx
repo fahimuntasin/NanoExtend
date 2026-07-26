@@ -74,6 +74,7 @@ function App() {
         </a>
         <nav aria-label="Main navigation">
           <a href="#features">Features</a>
+          <a href="#hardware">Hardware</a>
           <a href="#installer">Install</a>
           <a href="#ota">OTA</a>
           <a href="#docs">Docs</a>
@@ -221,6 +222,51 @@ function App() {
                 <p>{text}</p>
               </article>
             ))}
+          </div>
+        </section>
+
+        <section className="section hardware-section" id="hardware">
+          <div className="section-heading">
+            <span className="eyebrow">Real hardware</span>
+            <h2>Captured on a living ESP32.</h2>
+            <p>
+              Not a stock render. This is the actual DevKit NanoExtend flashes,
+              photographs, and ships documentation against.
+            </p>
+          </div>
+          <div className="hardware-stage">
+            <div className="hardware-glow" aria-hidden="true" />
+            <figure className="hardware-frame">
+              <img
+                alt="ESP32 DevKit used by NanoExtend"
+                className="hardware-board"
+                decoding="async"
+                loading="lazy"
+                src={`${import.meta.env.BASE_URL}brand/product/esp32-cutout.png`}
+              />
+              <figcaption>
+                <strong>NanoExtend hardware</strong>
+                <span>ESP32 DevKit · real device photo · USB powered</span>
+              </figcaption>
+            </figure>
+            <div className="hardware-meta">
+              <div>
+                <small>Board</small>
+                <strong>ESP32 DevKit V1</strong>
+              </div>
+              <div>
+                <small>Flash</small>
+                <strong>4 MB · no PSRAM</strong>
+              </div>
+              <div>
+                <small>Power</small>
+                <strong>USB only</strong>
+              </div>
+              <div>
+                <small>Target</small>
+                <strong>1–2 clients</strong>
+              </div>
+            </div>
           </div>
         </section>
 

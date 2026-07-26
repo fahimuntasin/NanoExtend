@@ -6,7 +6,9 @@ two circuit nodes and outbound radio waves.
 ## Assets
 
 - `logo.svg` — primary square mark and favicon source
-- `banner.svg` — README/GitHub/social banner (1200×630)
+- `banner.svg` — README/GitHub/social banner
+- `product/esp32-cutout.png` — background-removed real ESP32 photo
+- `product/showcase-*.jpg` — framed dark product cards for README and web
 - Website `Logo.tsx` — accessible inline version with optional animation
 
 ## Color system

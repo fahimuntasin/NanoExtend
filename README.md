@@ -10,6 +10,12 @@
 [![Hardware: ESP32](https://img.shields.io/badge/hardware-ESP32-black.svg)](docs/installation.md)
 
 [Install](#install-in-five-minutes) · [Documentation](docs/getting-started.md) · [API](api/openapi.yaml) · [Roadmap](ROADMAP.md) · [Contributing](CONTRIBUTING.md)
+
+<br />
+
+<img src="brand/product/showcase-readme.jpg" alt="NanoExtend running on a real ESP32 DevKit" width="920" />
+
+<p><em>Real ESP32 hardware — background removed, framed, and captured for NanoExtend.</em></p>
 </div>
 
 ---
@@ -79,7 +85,7 @@ website/              React + Tailwind landing site and Web Serial installer
 api/openapi.yaml      versioned device API contract
 docs/                 user, security, OTA, architecture, developer docs
 .github/workflows/     CI, semantic release artifacts, GitHub Pages
-brand/                original NanoExtend visual identity
+brand/                original NanoExtend visual identity + product photography
 ```
 
 ## Exact toolchain

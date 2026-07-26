@@ -8,9 +8,11 @@ All notable changes follow [Keep a Changelog](https://keepachangelog.com/) and [
 - Upgraded the animated NanoExtend mark with circuit-trace motion, signal arcs, and reduced-motion support.
 - Refreshed landing-page branding, SEO assets, and installer firmware packaging for 1.0.1.
 - Replaced Cloudflare Pages deployment with GitHub Pages hosting.
+- Added a real ESP32 product-photo showcase to the README and landing page.
 
 ### Added
 - Automatic GitHub Pages workflow that builds firmware installer artifacts and deploys the site.
+- Background-removed, framed hardware photography under `brand/product/`.
 
 ## [1.0.1] - 2026-07-23
 
