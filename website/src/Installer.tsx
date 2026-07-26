@@ -141,7 +141,7 @@ function Installer() {
       setState("done");
       setProgress(100);
       setMessage(
-        "Installation complete. Join NanoExtend with password changeme123.",
+        "Installation complete. Next: open USB Setup below, or join NanoExtend Wi-Fi (changeme123) and visit http://192.168.4.1",
       );
     } catch (error) {
       setState("error");

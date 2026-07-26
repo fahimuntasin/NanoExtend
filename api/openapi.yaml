@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: NanoExtend Device API
-  version: 1.0.1
+  version: 1.0.2
   description: Local management API for the NanoExtend ESP32 NAT router.
   license:
     name: MIT

@@ -1,26 +1,20 @@
 {
   "schema": 1,
   "project": "NanoExtend",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "channel": "stable",
   "hardware": "esp32dev-4mb",
-  "releaseNotesUrl": "https://github.com/fahimuntasin/NanoExtend/releases/tag/v1.0.1",
+  "releaseNotesUrl": "https://github.com/fahimuntasin/NanoExtend/releases/tag/v1.0.2",
   "factory": {
-    "name": "nanoextend-1.0.1.factory.bin",
-    "file": "/firmware/nanoextend-1.0.1.factory.bin",
-    "size": 1281952,
-    "sha256": "9bb3cfe966b06678c7a9cc6eb3e157ded3c28438d6cb4aa742f6ff0178f9c85b"
+    "name": "nanoextend-1.0.2.factory.bin",
+    "file": "/firmware/nanoextend-1.0.2.factory.bin",
+    "size": 1294144,
+    "sha256": "93122ecb3c46a889748847f9277043232cb51e0f8e672fcaa13d732fe1f1b4b6"
   },
   "ota": {
-    "name": "nanoextend-1.0.1.ota.bin",
-    "file": "/firmware/nanoextend-1.0.1.ota.bin",
-    "size": 1216416,
-    "sha256": "5e7e22d5a51f7cd750d6529865556c2fdad0351125d417552626335c7c59f6a6"
-  },
-  "file": "/firmware/nanoextend-1.0.1.factory.bin",
-  "size": 1281952,
-  "sha256": "9bb3cfe966b06678c7a9cc6eb3e157ded3c28438d6cb4aa742f6ff0178f9c85b",
-  "chip": "ESP32",
-  "flashSize": "4MB",
-  "releaseNotes": "NanoExtend 1.0.1 \u2014 GitHub Releases OTA default, verified dual-slot updates, animated brand system."
+    "name": "nanoextend-1.0.2.ota.bin",
+    "file": "/firmware/nanoextend-1.0.2.ota.bin",
+    "size": 1228608,
+    "sha256": "f665826f4ecd0f426ebc809675cc64d7a6f631c08e86d204c30dde49913b3dd7"
+  }
 }

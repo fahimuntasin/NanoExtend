@@ -4,15 +4,16 @@ All notable changes follow [Keep a Changelog](https://keepachangelog.com/) and [
 
 ## [Unreleased]
 
-### Changed
-- Upgraded the animated NanoExtend mark with circuit-trace motion, signal arcs, and reduced-motion support.
-- Refreshed landing-page branding, SEO assets, and installer firmware packaging for 1.0.1.
-- Replaced Cloudflare Pages deployment with GitHub Pages hosting.
-- Added a real ESP32 product-photo showcase to the README and landing page.
+## [1.0.2] - 2026-07-26
 
 ### Added
-- Automatic GitHub Pages workflow that builds firmware installer artifacts and deploys the site.
-- Background-removed, framed hardware photography under `brand/product/`.
+- `SerialAdmin` firmware channel over USB-UART for scan/connect/settings without SoftAP.
+- Landing-page USB Setup panel using Web Serial at 115200 baud.
+- `docs/usb-setup.md` protocol and security notes.
+- Real ESP32 product-photo showcase on the README and landing Hardware section.
+
+### Changed
+- Installer completion copy points to USB Setup as well as SoftAP onboarding.
 
 ## [1.0.1] - 2026-07-23
 

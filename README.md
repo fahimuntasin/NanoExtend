@@ -30,6 +30,7 @@ Typical embedded networking projects stop at a serial console and a working pack
 - **Safe lifecycle:** checksummed settings, backup/restore, factory reset, crash diagnostics
 - **Verified OTA:** SHA-256 uploads, equal dual slots, stable-boot confirmation
 - **Five-minute installer:** React/Tailwind GitHub Pages site with Web Serial flashing
+- **USB setup:** configure upstream Wi-Fi from a PC over the USB cable — no phone required
 - **Open ecosystem:** OpenAPI, CI/CD, release artifacts, security and contribution policies
 
 ## Install in five minutes
@@ -37,6 +38,10 @@ Typical embedded networking projects stop at a serial console and a working pack
 ### Browser installer
 
 Open [https://fahimuntasin.github.io/NanoExtend/](https://fahimuntasin.github.io/NanoExtend/) in Chrome or Edge over HTTPS, select **Connect and install**, choose the ESP32 serial port, and wait for verification. The installer detects the chip and validates the firmware SHA-256 before flashing.
+
+### USB setup (no phone)
+
+Keep the board plugged into your PC, open **USB Setup** on the same site, connect Web Serial at 115200, scan networks, and join upstream Wi-Fi. The SoftAP dashboard at `http://192.168.4.1` remains available when you join the `NanoExtend` Wi-Fi from any device. See [USB setup](docs/usb-setup.md).
 
 ### PlatformIO
 
@@ -60,11 +65,14 @@ Change the default AP password immediately.
 ## Architecture
 
 ```text
-Phone / laptop
-     │ Wi-Fi + DHCP
+USB cable (PC Web Serial setup)
+     │
+Phone / laptop Wi-Fi
+     │ SoftAP + DHCP
      ▼
 NanoExtend SoftAP (192.168.4.1)
      ├── Local dashboard + REST / WebSocket
+     ├── USB serial admin (NE> JSON)
      ├── Captive portal + DNS manager
      ├── Settings / OTA / recovery
      └── lwIP NAPT

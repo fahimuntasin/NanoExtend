@@ -4,6 +4,7 @@
 #include "config.h"
 #include "logger.h"
 #include "ota.h"
+#include "serial_admin.h"
 #include "storage.h"
 #include "system.h"
 #include "version.h"
@@ -26,6 +27,7 @@ void setup() {
   DeviceSettings settings = Storage::load();
   WifiManager::begin(settings);
   WebServerApp::begin();
+  SerialAdmin::begin();
 
   LOG_I("System", "Ready AP=%s IP=%s", settings.apSsid, WiFi.softAPIP().toString().c_str());
 }
@@ -34,6 +36,7 @@ void loop() {
   WifiManager::loop();
   SystemInfo::loop();
   WebServerApp::loop();
+  SerialAdmin::loop();
   // Cooperative yield only — never long delay().
   delay(1);
 }

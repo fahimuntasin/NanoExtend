@@ -26,6 +26,7 @@ Phone/Tablet ──WiFi── SoftAP (NanoExtend / 192.168.4.1)
 | `dns_manager` | Upstream/Cloudflare/Google DNS selection + SoftAP DHCP DNS |
 | `captive_portal` | Wildcard DNS + OS captive redirects |
 | `web_server` | SPA assets, REST, WebSocket, CSRF/rate limits, SoftAP ACL |
+| `serial_admin` | USB-UART JSON admin for PC setup without SoftAP/phone |
 | `ota` | Streamed dual-slot update with abort-on-failure |
 | `storage` | Checksummed Preferences blob + crash record |
 | `system` | Metrics, health probes, reset reason |

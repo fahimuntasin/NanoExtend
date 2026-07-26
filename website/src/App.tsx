@@ -26,6 +26,7 @@ import {
 import "./App.css";
 import Installer from "./Installer";
 import Logo from "./Logo";
+import UsbSetup from "./UsbSetup";
 
 const repoUrl = "https://github.com/fahimuntasin/NanoExtend";
 const siteUrl = "https://fahimuntasin.github.io/NanoExtend/";
@@ -76,6 +77,7 @@ function App() {
           <a href="#features">Features</a>
           <a href="#hardware">Hardware</a>
           <a href="#installer">Install</a>
+          <a href="#usb-setup">USB Setup</a>
           <a href="#ota">OTA</a>
           <a href="#docs">Docs</a>
           <a href="#faq">FAQ</a>
@@ -97,7 +99,7 @@ function App() {
           <div className="hero-copy">
             <div className="release-pill">
               <span />
-              NanoExtend 1.0.1 · Open source
+              NanoExtend 1.0.2 · Open source
               <ArrowRight size={14} aria-hidden="true" />
             </div>
             <h1>
@@ -367,6 +369,19 @@ function App() {
           <Installer />
         </section>
 
+        <section className="section installer-section" id="usb-setup">
+          <div className="section-heading">
+            <span className="eyebrow">No phone required</span>
+            <h2>USB cable. Browser. Done.</h2>
+            <p>
+              Keep the ESP32 plugged into your PC. Web Serial talks to the
+              firmware over USB so you can scan Wi-Fi and join upstream without
+              joining the SoftAP first.
+            </p>
+          </div>
+          <UsbSetup />
+        </section>
+
         <section className="section ota-section" id="ota">
           <div className="ota-copy">
             <span className="eyebrow">Update center</span>
@@ -397,7 +412,7 @@ function App() {
                 <CloudDownload size={23} />
               </div>
               <div>
-                <strong>NanoExtend 1.0.1</strong>
+                <strong>NanoExtend 1.0.2</strong>
                 <span>Current stable release</span>
               </div>
               <b>Stable</b>
@@ -519,6 +534,10 @@ function App() {
               [
                 "Can a failed OTA brick the router?",
                 "Dual OTA slots keep the previous image until stable-boot verification passes.",
+              ],
+              [
+                "Do I need a phone to set it up?",
+                "No. Flash over USB, then use USB Setup in Chrome/Edge to scan and join upstream Wi-Fi. SoftAP is still available when you want the full dashboard.",
               ],
             ].map(([question, answer]) => (
               <details key={question}>

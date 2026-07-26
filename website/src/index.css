@@ -788,6 +788,117 @@ input {
   cursor: not-allowed;
   transform: none;
 }
+
+.usb-setup-shell {
+  margin-top: 0;
+}
+.usb-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 8px 0 4px;
+}
+.usb-status-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin: 18px 0;
+}
+.usb-status-grid div {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 14px;
+  background: rgba(255, 255, 255, 0.02);
+}
+.usb-status-grid small {
+  display: block;
+  color: var(--muted);
+  font-size: 11px;
+  margin-bottom: 8px;
+}
+.usb-status-grid strong {
+  font-size: 14px;
+  font-weight: 600;
+  word-break: break-all;
+}
+.usb-wifi-panel {
+  margin-top: 8px;
+  border-top: 1px solid var(--line);
+  padding-top: 18px;
+}
+.usb-wifi-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.usb-wifi-toolbar strong {
+  font-size: 14px;
+}
+.usb-network-list {
+  display: grid;
+  gap: 8px;
+  max-height: 220px;
+  overflow: auto;
+  margin-bottom: 14px;
+}
+.usb-network {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  text-align: left;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: transparent;
+  color: inherit;
+  padding: 12px 14px;
+  cursor: pointer;
+}
+.usb-network span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+.usb-network em {
+  color: var(--muted);
+  font-style: normal;
+  font-size: 12px;
+  white-space: nowrap;
+}
+.usb-network.selected,
+.usb-network:hover {
+  border-color: #3a3a3a;
+  background: rgba(255, 255, 255, 0.03);
+}
+.usb-empty {
+  color: var(--muted);
+  font-size: 13px;
+  margin: 8px 0;
+}
+.usb-field {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+.usb-field span {
+  color: var(--muted);
+  font-size: 12px;
+}
+.usb-field input {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #050505;
+  color: #f2f2f2;
+  padding: 12px 14px;
+  font: inherit;
+}
+.usb-field input:focus {
+  outline: 1px solid #4a4a4a;
+}
+
 .install-log {
   border-top: 1px solid var(--line);
   margin-top: 20px;
@@ -1220,6 +1331,9 @@ footer {
   .hardware-meta {
     grid-template-columns: 1fr 1fr;
   }
+  .usb-status-grid {
+    grid-template-columns: 1fr 1fr;
+  }
   .hardware-frame {
     padding: 36px 20px 20px;
     border-radius: 22px;
@@ -1287,7 +1401,8 @@ footer {
   }
   .feature-grid,
   .docs-grid,
-  .hardware-meta {
+  .hardware-meta,
+  .usb-status-grid {
     grid-template-columns: 1fr;
   }
   .feature-card {
