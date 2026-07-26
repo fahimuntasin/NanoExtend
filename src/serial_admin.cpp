@@ -7,6 +7,7 @@
 #include "config.h"
 #include "logger.h"
 #include "ota.h"
+#include "status_led.h"
 #include "storage.h"
 #include "system.h"
 #include "version.h"
@@ -132,6 +133,16 @@ void handleCommand(JsonDocument& req) {
     result["name"] = NANOEXTEND_NAME;
     result["channel"] = "usb-serial";
     result["dashboard"] = true;
+    result["led"] = true;
+    StatusLed::celebrateConnect();
+    replyOk(id, result);
+    return;
+  }
+
+  if (strcmp(cmd, "celebrate") == 0) {
+    StatusLed::celebrateConnect();
+    JsonDocument result;
+    result["led"] = "celebrate";
     replyOk(id, result);
     return;
   }

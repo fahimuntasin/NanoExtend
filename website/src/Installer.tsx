@@ -142,7 +142,7 @@ function Installer() {
       setState("done");
       setProgress(100);
       setMessage(
-        "Installation complete. Open USB Dashboard below for the full SoftAP-style UI over the cable, or join NanoExtend Wi-Fi (changeme123) at http://192.168.4.1",
+        "Installation complete. Open the USB Dashboard for the full SoftAP-style UI — the board LED will celebrate on connect.",
       );
     } catch (error) {
       setState("error");

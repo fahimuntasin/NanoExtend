@@ -12,24 +12,26 @@ import {
   Globe2,
   LockKeyhole,
   MemoryStick,
+  Moon,
   Network,
   Radio,
   RefreshCw,
   Router,
   ShieldCheck,
   Sparkles,
-  TerminalSquare,
+  Sun,
   Users,
   Wifi,
   Zap,
 } from "lucide-react";
+import { Link } from "react-router-dom";
 import "./App.css";
 import Installer from "./Installer";
 import Logo from "./Logo";
-import UsbSetup from "./UsbSetup";
+import { MadeBy } from "./MadeBy";
+import { useTheme } from "./theme";
 
 const repoUrl = "https://github.com/fahimuntasin/NanoExtend";
-const siteUrl = "https://fahimuntasin.github.io/NanoExtend/";
 const openApiUrl = `${import.meta.env.BASE_URL}api/openapi.yaml`;
 
 const features = [
@@ -65,7 +67,9 @@ const features = [
   ],
 ] as const;
 
-function App() {
+function LandingPage() {
+  const { theme, toggleTheme } = useTheme();
+
   return (
     <div className="site-shell">
       <header className="nav-wrap">
@@ -77,21 +81,30 @@ function App() {
           <a href="#features">Features</a>
           <a href="#hardware">Hardware</a>
           <a href="#installer">Install</a>
-          <a href="#usb-setup">USB Dashboard</a>
-          <a href="#ota">OTA</a>
-          <a href="#docs">Docs</a>
+          <Link to="/dashboard">Dashboard</Link>
+          <Link to="/docs">Docs</Link>
+          <Link to="/changelog">Changelog</Link>
           <a href="#faq">FAQ</a>
-          <a href="#roadmap">Roadmap</a>
         </nav>
-        <a
-          className="github-link"
-          href={repoUrl}
-          rel="noreferrer"
-          target="_blank"
-        >
-          <GitFork size={17} aria-hidden="true" />
-          GitHub
-        </a>
+        <div className="nav-end">
+          <button
+            aria-label="Toggle theme"
+            className="button white-btn theme-toggle"
+            onClick={toggleTheme}
+            type="button"
+          >
+            {theme === "light" ? <Moon size={16} /> : <Sun size={16} />}
+          </button>
+          <a
+            className="github-link"
+            href={repoUrl}
+            rel="noreferrer"
+            target="_blank"
+          >
+            <GitFork size={17} aria-hidden="true" />
+            GitHub
+          </a>
+        </div>
       </header>
 
       <main id="main">
@@ -99,7 +112,7 @@ function App() {
           <div className="hero-copy">
             <div className="release-pill">
               <span />
-              NanoExtend 1.0.3 · Open source
+              NanoExtend 1.0.4 · Open source
               <ArrowRight size={14} aria-hidden="true" />
             </div>
             <h1>
@@ -112,11 +125,11 @@ function App() {
               with a dashboard that feels at home in 2026.
             </p>
             <div className="hero-actions">
-              <a className="button primary" href="#installer">
-                Install NanoExtend <ArrowRight size={17} aria-hidden="true" />
-              </a>
-              <a className="button secondary" href="#docs">
-                Read the docs
+              <Link className="button primary white-btn" to="/dashboard">
+                Open USB Dashboard <ArrowRight size={17} aria-hidden="true" />
+              </Link>
+              <a className="button secondary" href="#installer">
+                Install firmware
               </a>
             </div>
             <div className="hero-proof">
@@ -363,23 +376,16 @@ function App() {
             <h2>From box to router, in one tab.</h2>
             <p>
               Chip detection, firmware download, checksum verification,
-              flashing, and restart.
+              flashing, and restart — then jump straight into the USB
+              dashboard.
             </p>
           </div>
           <Installer />
-        </section>
-
-        <section className="section installer-section" id="usb-setup">
-          <div className="section-heading">
-            <span className="eyebrow">No phone required · build 1.0.3</span>
-            <h2>USB cable. Full dashboard.</h2>
-            <p>
-              SoftAP-style Home, Scan, Clients, Settings, System, and Logs —
-              driven over USB serial so any desktop can configure NanoExtend
-              without joining the SoftAP first.
-            </p>
+          <div className="post-install-cta">
+            <Link className="button primary white-btn" to="/dashboard">
+              Open full USB Dashboard <ArrowRight size={17} />
+            </Link>
           </div>
-          <UsbSetup />
         </section>
 
         <section className="section ota-section" id="ota">
@@ -412,7 +418,7 @@ function App() {
                 <CloudDownload size={23} />
               </div>
               <div>
-                <strong>NanoExtend 1.0.3</strong>
+                <strong>NanoExtend 1.0.4</strong>
                 <span>Current stable release</span>
               </div>
               <b>Stable</b>
@@ -442,41 +448,60 @@ function App() {
               [
                 Zap,
                 "Getting started",
-                "Flash your first board and connect in five minutes.",
-                `${repoUrl}/blob/main/docs/getting-started.md`,
+                "Flash your first board and open the USB dashboard.",
+                "/docs",
+                "internal",
               ],
               [
-                TerminalSquare,
-                "Developer guide",
-                "Build, test, debug, and understand the project.",
-                `${repoUrl}/blob/main/docs/developer-guide.md`,
+                BookOpen,
+                "USB & SoftAP docs",
+                "Phone-free USB path, SoftAP, and security notes.",
+                "/docs",
+                "internal",
+              ],
+              [
+                Sparkles,
+                "Changelog",
+                "What shipped in each release, including 1.0.4.",
+                "/changelog",
+                "internal",
               ],
               [
                 Code2,
                 "API reference",
                 "Versioned REST and WebSocket contracts with OpenAPI.",
                 openApiUrl,
+                "external",
               ],
-              [
-                ShieldCheck,
-                "Security",
-                "Threat model, OTA trust, reporting, and hardening.",
-                `${repoUrl}/blob/main/SECURITY.md`,
-              ],
-            ].map(([Icon, title, text, href]) => (
-              <a
-                className="doc-card"
-                href={href as string}
-                key={title as string}
-              >
-                <Icon size={20} />
-                <h3>{title as string}</h3>
-                <p>{text as string}</p>
-                <span>
-                  Explore <ArrowRight size={14} />
-                </span>
-              </a>
-            ))}
+            ].map(([Icon, title, text, href, kind]) =>
+              kind === "internal" ? (
+                <Link
+                  className="doc-card"
+                  key={title as string}
+                  to={href as string}
+                >
+                  <Icon size={20} />
+                  <h3>{title as string}</h3>
+                  <p>{text as string}</p>
+                  <span>
+                    Explore <ArrowRight size={14} />
+                  </span>
+                </Link>
+              ) : (
+                <a
+                  className="doc-card"
+                  href={href as string}
+                  key={title as string}
+                >
+                  <Icon size={20} />
+                  <h3>{title as string}</h3>
+                  <p>{text as string}</p>
+                  <span>
+                    Explore <ArrowRight size={14} />
+                  </span>
+                </a>
+              ),
+            )}
           </div>
         </section>
 
@@ -537,7 +562,7 @@ function App() {
               ],
               [
                 "Do I need a phone to set it up?",
-                "No. Flash over USB, then open USB Dashboard in Chrome/Edge for the same SoftAP-style controls over the cable.",
+                "No. Flash over USB, then open the full USB Dashboard for SoftAP-style controls. The onboard LED celebrates when you connect.",
               ],
             ].map(([question, answer]) => (
               <details key={question}>
@@ -587,10 +612,10 @@ function App() {
           </div>
           <div>
             <strong>Resources</strong>
-            <a href="#docs">Documentation</a>
+            <Link to="/docs">Documentation</Link>
+            <Link to="/changelog">Changelog</Link>
+            <Link to="/dashboard">USB Dashboard</Link>
             <a href={openApiUrl}>OpenAPI</a>
-            <a href={siteUrl}>GitHub Pages</a>
-            <a href={`${repoUrl}/discussions`}>Discussions</a>
           </div>
           <div>
             <strong>Community</strong>
@@ -600,12 +625,12 @@ function App() {
           </div>
         </div>
         <div className="footer-bottom">
+          <MadeBy />
           <span>© 2026 NanoExtend contributors.</span>
-          <span>Designed and built in the open.</span>
         </div>
       </footer>
     </div>
   );
 }
 
-export default App;
+export default LandingPage;

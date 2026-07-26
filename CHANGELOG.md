@@ -4,6 +4,17 @@ All notable changes follow [Keep a Changelog](https://keepachangelog.com/) and [
 
 ## [Unreleased]
 
+## [1.0.4] - 2026-07-26
+
+### Added
+- Full-page USB dashboard route (`#/dashboard`) with Claude-inspired light theme and theme switcher.
+- Live SVG atmosphere art, white action buttons, and Made by fahimuntasin.com credit.
+- In-site Docs and Changelog pages.
+- Onboard LED celebrate double-pulse on USB `hello` / connect (`StatusLed`).
+
+### Changed
+- Landing page links to the dedicated dashboard instead of embedding USB setup mid-page.
+
 ## [1.0.3] - 2026-07-26
 
 ### Added

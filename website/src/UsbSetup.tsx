@@ -106,7 +106,7 @@ function encryptionLabel(enc: number): string {
   return enc === 0 ? "Open" : "Secured";
 }
 
-function UsbSetup() {
+function UsbSetup({ fullPage = false }: { fullPage?: boolean }) {
   const [conn, setConn] = useState<ConnState>("idle");
   const [message, setMessage] = useState(
     "Plug in the ESP32. This USB dashboard mirrors the SoftAP UI — no phone Wi‑Fi needed.",
@@ -349,7 +349,11 @@ function UsbSetup() {
 
       setFw(String(hello.fw ?? ""));
       setConn("ready");
-      setMessage("USB dashboard live — same controls as SoftAP, over the cable.");
+      setMessage(
+        hello.led
+          ? "Connected — watch the board LED celebrate, then configure Wi‑Fi."
+          : "USB dashboard live — same controls as SoftAP, over the cable.",
+      );
       try {
         await refreshStatus();
       } catch {
@@ -462,14 +466,18 @@ function UsbSetup() {
   const wifi = status?.wifi;
   const sys = status?.system;
 
-  return (
-    <div className="usb-dash">
+    return (
+    <div className={`usb-dash ${fullPage ? "usb-dash-full" : ""}`}>
       {conn !== "ready" ? (
         <div className="usb-dash-gate">
           <div className="usb-dash-gate-head">
             <div>
               <span className="eyebrow">USB dashboard</span>
-              <h3>Same SoftAP UI. Over the cable.</h3>
+              <h3>
+                {fullPage
+                  ? "Connect once. Control everything."
+                  : "Same SoftAP UI. Over the cable."}
+              </h3>
             </div>
             <div className="device-pill">
               <Usb size={15} aria-hidden="true" />
@@ -484,6 +492,7 @@ function UsbSetup() {
             <span>
               Pick <em>USB Serial</em> / <em>CH340</em> / <em>CP210x</em>. Skip{" "}
               <em>ttyS0–ttyS15</em> — those belong to the PC, not the ESP32.
+              On connect the onboard LED plays a double-pulse celebrate.
             </span>
           </aside>
           <button

@@ -1,20 +1,20 @@
 {
   "schema": 1,
   "project": "NanoExtend",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "channel": "stable",
   "hardware": "esp32dev-4mb",
-  "releaseNotesUrl": "https://github.com/fahimuntasin/NanoExtend/releases/tag/v1.0.3",
+  "releaseNotesUrl": "https://github.com/fahimuntasin/NanoExtend/releases/tag/v1.0.4",
   "factory": {
-    "name": "nanoextend-1.0.3.factory.bin",
-    "file": "/firmware/nanoextend-1.0.3.factory.bin",
-    "size": 1295520,
-    "sha256": "f1f5a13dc2f9eb9c84a7c733f50a66245a87acaa858684148eb464c0878e2bd1"
+    "name": "nanoextend-1.0.4.factory.bin",
+    "file": "/firmware/nanoextend-1.0.4.factory.bin",
+    "size": 1300240,
+    "sha256": "345c4f9a3047f7b469a36e74b43fd95360c4696bc5986809f55e27b27181440d"
   },
   "ota": {
-    "name": "nanoextend-1.0.3.ota.bin",
-    "file": "/firmware/nanoextend-1.0.3.ota.bin",
-    "size": 1229984,
-    "sha256": "8880ccb3d213980f0637c28a20b739db07441688bd5fd5092d0f9588ec264d5f"
+    "name": "nanoextend-1.0.4.ota.bin",
+    "file": "/firmware/nanoextend-1.0.4.ota.bin",
+    "size": 1234704,
+    "sha256": "6e7abd8f69719d9fd5b7d621c4a2ef42c0507e96742f4d124ba94c1420f85af6"
   }
 }

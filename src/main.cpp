@@ -5,6 +5,7 @@
 #include "logger.h"
 #include "ota.h"
 #include "serial_admin.h"
+#include "status_led.h"
 #include "storage.h"
 #include "system.h"
 #include "version.h"
@@ -13,6 +14,7 @@
 
 void setup() {
   Logger::begin(115200);
+  StatusLed::begin();
   LOG_I("System", "NanoExtend %s starting", NANOEXTEND_FW_VERSION);
   LOG_I("System", "Platform pin %s target core %s", NANOEXTEND_PLATFORM_PIN,
         NANOEXTEND_ARDUINO_CORE_TARGET);
@@ -28,6 +30,7 @@ void setup() {
   WifiManager::begin(settings);
   WebServerApp::begin();
   SerialAdmin::begin();
+  StatusLed::celebrateConnect();
 
   LOG_I("System", "Ready AP=%s IP=%s", settings.apSsid, WiFi.softAPIP().toString().c_str());
 }
@@ -37,6 +40,7 @@ void loop() {
   SystemInfo::loop();
   WebServerApp::loop();
   SerialAdmin::loop();
+  StatusLed::loop();
   // Cooperative yield only — never long delay().
   delay(1);
 }

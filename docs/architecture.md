@@ -27,6 +27,7 @@ Phone/Tablet ──WiFi── SoftAP (NanoExtend / 192.168.4.1)
 | `captive_portal` | Wildcard DNS + OS captive redirects |
 | `web_server` | SPA assets, REST, WebSocket, CSRF/rate limits, SoftAP ACL |
 | `serial_admin` | USB-UART JSON admin for PC setup without SoftAP/phone |
+| `status_led` | Onboard LED celebrate / error patterns for USB feedback |
 | `ota` | Streamed dual-slot update with abort-on-failure |
 | `storage` | Checksummed Preferences blob + crash record |
 | `system` | Metrics, health probes, reset reason |

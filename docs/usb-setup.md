@@ -6,19 +6,22 @@ NanoExtend invents a **USB dashboard**: the same SoftAP-style UI (Home, Scan, Cl
 
 ## Requirements
 
-- Firmware **1.0.3+**
+- Firmware **1.0.4+**
 - Data USB cable
 - Chrome or Edge on desktop (HTTPS)
 - Board already flashed with NanoExtend
 
 ## Flow
 
-1. Open [USB Dashboard](https://fahimuntasin.github.io/NanoExtend/#usb-setup).
+1. Open [USB Dashboard](https://fahimuntasin.github.io/NanoExtend/#/dashboard) (full page — not embedded in the landing scroll).
 2. Click **Connect USB dashboard** and choose the USB serial port (CH340 / CP210x — not `ttyS*`).
-3. Use the tabs exactly like the SoftAP SPA: scan, connect, settings, logs, reboot, factory reset.
-4. SoftAP at `http://192.168.4.1` remains available when you join the `NanoExtend` Wi-Fi.
+3. The onboard LED plays a **double-pulse celebrate** pattern when `hello` succeeds.
+4. Use the tabs: scan, connect, settings, logs, reboot, factory reset.
+5. SoftAP at `http://192.168.4.1` remains available when you join the `NanoExtend` Wi-Fi.
 
 OTA binary upload still uses SoftAP or the browser installer.
+
+Theme: light (Claude-inspired paper) or dark — toggle in the dashboard bar.
 
 ## Protocol (for tools)
 
@@ -29,7 +32,7 @@ Baud: **115200**. Prefer the USB-UART bridge (CH340 / CP210x / FTDI). On Linux, 
 | Host → device | `NE>{"v":1,"id":1,"cmd":"ping"}\n` |
 | Device → host | `NE{"v":1,"id":1,"ok":true,"result":{...}}\n` |
 
-Commands: `ping` / `hello`, `status`, `scan`, `connect`, `disconnect`, `settings_get`, `settings_set`, `clients`, `logs`, `health`, `factory_reset`, `reboot`.
+Commands: `ping` / `hello`, `celebrate`, `status`, `scan`, `connect`, `disconnect`, `settings_get`, `settings_set`, `clients`, `logs`, `health`, `factory_reset`, `reboot`.
 
 Ignore any serial line that does not start with `NE{`.
 
