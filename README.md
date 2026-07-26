@@ -41,7 +41,7 @@ Open [https://fahimuntasin.github.io/NanoExtend/](https://fahimuntasin.github.io
 
 ### USB setup (no phone)
 
-Keep the board plugged into your PC, open **USB Dashboard** on the same site, and use the SoftAP-style UI over Web Serial. See [USB dashboard](docs/usb-setup.md).
+Open the full **USB Dashboard** at `#/dashboard` (Claude-inspired light/dark themes). SoftAP-style tabs over Web Serial; the onboard LED celebrates on connect. See [USB dashboard](docs/usb-setup.md).
 
 ### PlatformIO
 
