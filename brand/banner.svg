@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="640" viewBox="0 0 1280 640" fill="none">
+  <rect width="1280" height="640" fill="#050505"/>
+  <circle cx="980" cy="220" r="220" fill="#fff" fill-opacity="0.03"/>
+  <circle cx="980" cy="220" r="140" fill="#fff" fill-opacity="0.04"/>
+  <g transform="translate(860 100) scale(3.4)">
+    <path d="M22 76V24L68 72V20" stroke="#fff" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M18 68 L30 68 L36 74" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="22" cy="20" r="8" stroke="#fff" stroke-width="7"/>
+    <circle cx="68" cy="76" r="8" stroke="#fff" stroke-width="7"/>
+    <circle cx="22" cy="20" r="2.5" fill="#fff"/>
+    <circle cx="68" cy="76" r="2.5" fill="#fff"/>
+    <path d="M56 20c9 0 16 7 16 16M56 8c16 0 28 12 28 28M56 -2c22 0 38 16 38 38" stroke="#fff" stroke-width="6" stroke-linecap="round"/>
+  </g>
+  <text x="88" y="280" fill="#fff" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="72" font-weight="600">NanoExtend</text>
+  <text x="88" y="350" fill="#9a9a9a" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="34">Tiny ESP32. Big Network.</text>
+  <text x="88" y="430" fill="#6f6f6f" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="22">Wi-Fi NAT router · Captive portal · Verified OTA · Browser installer</text>
+</svg>

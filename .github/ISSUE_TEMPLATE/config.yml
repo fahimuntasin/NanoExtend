@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Setup help and questions
+    url: https://github.com/fahimuntasin/NanoExtend/discussions
+    about: Ask the community before opening a bug.
+  - name: Security vulnerability
+    url: https://github.com/fahimuntasin/NanoExtend/security/advisories/new
+    about: Report vulnerabilities privately.

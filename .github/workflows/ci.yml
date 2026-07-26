@@ -1,0 +1,80 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  firmware:
+    name: Firmware build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      - run: pip install platformio==6.1.19 clang-format==22.1.8
+      - name: Check C/C++ formatting
+        run: |
+          python3 - <<'PY'
+          import glob
+          import subprocess
+          files = glob.glob("src/*.cpp")
+          files += [path for path in glob.glob("include/*.h")
+                    if not path.endswith("web_assets.h")]
+          subprocess.check_call(["clang-format", "--dry-run", "--Werror", *files])
+          PY
+      - run: pio run -e esp32dev
+      - name: Enforce OTA slot budget
+        run: |
+          test $(stat -c%s .pio/build/esp32dev/firmware.bin) -lt $((0x1C0000))
+      - uses: actions/upload-artifact@v7
+        with:
+          name: firmware-ci
+          path: |
+            .pio/build/esp32dev/firmware.bin
+            .pio/build/esp32dev/firmware.factory.bin
+            .pio/build/esp32dev/firmware.elf
+
+  website:
+    name: Website build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: website
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: website/package-lock.json
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run format:check
+      - run: npm run build
+      - uses: actions/upload-artifact@v7
+        with:
+          name: website-ci
+          path: website/dist
+
+  repository:
+    name: Repository policy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Required files
+        run: |
+          test -f README.md
+          test -f SECURITY.md
+          test -f CONTRIBUTING.md
+          test -f CODE_OF_CONDUCT.md
+          test -f api/openapi.yaml
+      - name: Reject leaked private keys
+        run: |
+          ! grep -R --exclude-dir=.git --exclude-dir=node_modules --exclude='*.bin' -E 'BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY' .

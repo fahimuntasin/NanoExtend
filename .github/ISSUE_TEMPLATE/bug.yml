@@ -1,0 +1,49 @@
+name: Bug report
+description: Report a reproducible NanoExtend defect
+title: "bug: "
+labels: [bug, needs-triage]
+body:
+  - type: markdown
+    attributes:
+      value: Remove passwords, SSIDs, tokens, and private IP information from logs.
+  - type: input
+    id: version
+    attributes:
+      label: NanoExtend version
+      placeholder: v1.0.0
+    validations:
+      required: true
+  - type: dropdown
+    id: board
+    attributes:
+      label: Hardware
+      options: [ESP32 DevKit V1 4MB, Other classic ESP32]
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Reproduction steps
+      placeholder: "1. Flash… 2. Connect… 3. Observe…"
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Redacted serial/dashboard logs
+      render: text
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checks
+      options:
+        - label: I searched existing issues and discussions.
+          required: true
+        - label: I removed all secrets and personal network identifiers.
+          required: true

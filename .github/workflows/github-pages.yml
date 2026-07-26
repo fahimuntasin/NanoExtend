@@ -1,0 +1,100 @@
+name: GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+
+      - name: Install PlatformIO
+        run: pip install platformio==6.1.19
+
+      - name: Build installer firmware
+        run: |
+          pio run -e esp32dev
+          VERSION=$(python3 -c 'import re; print(re.search(r"define NANOEXTEND_FW_VERSION \"([^\"]+)\"", open("include/version.h").read()).group(1))')
+          mkdir -p website/public/firmware
+          cp .pio/build/esp32dev/firmware.factory.bin "website/public/firmware/nanoextend-${VERSION}.factory.bin"
+          cp .pio/build/esp32dev/firmware.bin "website/public/firmware/nanoextend-${VERSION}.ota.bin"
+          python3 scripts/release_manifest.py \
+            --version "$VERSION" \
+            --factory "website/public/firmware/nanoextend-${VERSION}.factory.bin" \
+            --ota "website/public/firmware/nanoextend-${VERSION}.ota.bin" \
+            --output website/public/firmware/manifest.json \
+            --base-url "/firmware"
+          python3 - "$VERSION" <<'PY'
+          import json, pathlib, sys
+          version = sys.argv[1]
+          path = pathlib.Path("website/public/firmware/manifest.json")
+          manifest = json.loads(path.read_text())
+          factory = manifest["factory"]
+          ota = manifest["ota"]
+          # Keep root-relative paths; the site resolves them with Vite BASE_URL.
+          for entry in (factory, ota):
+              entry["file"] = f"/firmware/{entry['name']}"
+          manifest.update({
+              "file": factory["file"],
+              "size": factory["size"],
+              "sha256": factory["sha256"],
+              "chip": "ESP32",
+              "flashSize": "4MB",
+              "releaseNotes": f"NanoExtend {version} release artifacts.",
+          })
+          path.write_text(json.dumps(manifest, indent=2) + "\n")
+          PY
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: website/package-lock.json
+
+      - name: Install website dependencies
+        run: npm ci
+        working-directory: website
+
+      - name: Copy API and documentation assets
+        run: |
+          mkdir -p website/public/api website/public/docs
+          cp api/openapi.yaml website/public/api/openapi.yaml
+          cp api/openapi.yaml website/public/openapi.yaml
+          cp -R docs/. website/public/docs/
+
+      - name: Build website
+        run: npm run build
+        working-directory: website
+
+      - name: Add GitHub Pages SPA fallback
+        run: cp website/dist/index.html website/dist/404.html
+
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: website/dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
