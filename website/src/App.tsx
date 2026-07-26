@@ -77,7 +77,7 @@ function App() {
           <a href="#features">Features</a>
           <a href="#hardware">Hardware</a>
           <a href="#installer">Install</a>
-          <a href="#usb-setup">USB Setup</a>
+          <a href="#usb-setup">USB Dashboard</a>
           <a href="#ota">OTA</a>
           <a href="#docs">Docs</a>
           <a href="#faq">FAQ</a>
@@ -99,7 +99,7 @@ function App() {
           <div className="hero-copy">
             <div className="release-pill">
               <span />
-              NanoExtend 1.0.2 · Open source
+              NanoExtend 1.0.3 · Open source
               <ArrowRight size={14} aria-hidden="true" />
             </div>
             <h1>
@@ -372,11 +372,11 @@ function App() {
         <section className="section installer-section" id="usb-setup">
           <div className="section-heading">
             <span className="eyebrow">No phone required</span>
-            <h2>USB cable. Browser. Done.</h2>
+            <h2>USB cable. Full dashboard.</h2>
             <p>
-              Keep the ESP32 plugged into your PC. Web Serial talks to the
-              firmware over USB so you can scan Wi-Fi and join upstream without
-              joining the SoftAP first.
+              SoftAP-style Home, Scan, Clients, Settings, System, and Logs —
+              driven over USB serial so any desktop can configure NanoExtend
+              without joining the SoftAP first.
             </p>
           </div>
           <UsbSetup />
@@ -412,7 +412,7 @@ function App() {
                 <CloudDownload size={23} />
               </div>
               <div>
-                <strong>NanoExtend 1.0.2</strong>
+                <strong>NanoExtend 1.0.3</strong>
                 <span>Current stable release</span>
               </div>
               <b>Stable</b>
@@ -537,7 +537,7 @@ function App() {
               ],
               [
                 "Do I need a phone to set it up?",
-                "No. Flash over USB, then use USB Setup in Chrome/Edge to scan and join upstream Wi-Fi. SoftAP is still available when you want the full dashboard.",
+                "No. Flash over USB, then open USB Dashboard in Chrome/Edge for the same SoftAP-style controls over the cable.",
               ],
             ].map(([question, answer]) => (
               <details key={question}>

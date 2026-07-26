@@ -41,7 +41,7 @@ Open [https://fahimuntasin.github.io/NanoExtend/](https://fahimuntasin.github.io
 
 ### USB setup (no phone)
 
-Keep the board plugged into your PC, open **USB Setup** on the same site, connect Web Serial at 115200, scan networks, and join upstream Wi-Fi. The SoftAP dashboard at `http://192.168.4.1` remains available when you join the `NanoExtend` Wi-Fi from any device. See [USB setup](docs/usb-setup.md).
+Keep the board plugged into your PC, open **USB Dashboard** on the same site, and use the SoftAP-style UI over Web Serial. See [USB dashboard](docs/usb-setup.md).
 
 ### PlatformIO
 

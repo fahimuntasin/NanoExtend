@@ -14,9 +14,9 @@
 
 namespace {
 
-constexpr size_t kLineMax = 512;
+constexpr size_t kLineMax = 768;
 constexpr uint32_t kRateWindowMs = 1000;
-constexpr uint8_t kRateMax = 10;
+constexpr uint8_t kRateMax = 24;
 
 char lineBuf_[kLineMax];
 size_t lineLen_ = 0;
@@ -131,6 +131,7 @@ void handleCommand(JsonDocument& req) {
     result["api"] = NANOEXTEND_API_VERSION;
     result["name"] = NANOEXTEND_NAME;
     result["channel"] = "usb-serial";
+    result["dashboard"] = true;
     replyOk(id, result);
     return;
   }
@@ -240,6 +241,54 @@ void handleCommand(JsonDocument& req) {
 
   if (strcmp(cmd, "reboot") == 0) {
     JsonDocument result;
+    result["rebooting"] = true;
+    replyOk(id, result);
+    delay(80);
+    ESP.restart();
+    return;
+  }
+
+  if (strcmp(cmd, "clients") == 0) {
+    JsonDocument result;
+    JsonArray arr = result["clients"].to<JsonArray>();
+    WifiManager::fillClientsJson(arr);
+    result["count"] = arr.size();
+    replyOk(id, result);
+    return;
+  }
+
+  if (strcmp(cmd, "logs") == 0) {
+    String text = Logger::exportText();
+    constexpr size_t kMax = 1800;
+    const bool truncated = text.length() > kMax;
+    if (truncated)
+      text = text.substring(text.length() - kMax);
+    JsonDocument result;
+    result["count"] = Logger::count();
+    result["text"] = text;
+    result["truncated"] = truncated;
+    replyOk(id, result);
+    return;
+  }
+
+  if (strcmp(cmd, "health") == 0) {
+    SystemInfo::requestHealthCheck();
+    JsonDocument result;
+    JsonObject sys = result["system"].to<JsonObject>();
+    SystemInfo::fillStatusJson(sys);
+    replyOk(id, result);
+    return;
+  }
+
+  if (strcmp(cmd, "factory_reset") == 0) {
+    const bool confirm = req["confirm"] | false;
+    if (!confirm) {
+      replyErr(id, "confirm required");
+      return;
+    }
+    Storage::factoryReset();
+    JsonDocument result;
+    result["reset"] = true;
     result["rebooting"] = true;
     replyOk(id, result);
     delay(80);

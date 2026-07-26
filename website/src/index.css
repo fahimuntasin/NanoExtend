@@ -813,6 +813,203 @@ input {
   font-style: normal;
   color: #ddd;
 }
+
+.usb-dash {
+  border: 1px solid #292929;
+  border-radius: 18px;
+  background: #050505;
+  padding: 22px;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.35);
+}
+.usb-dash-gate-head,
+.usb-dash-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: flex-start;
+  margin-bottom: 14px;
+}
+.usb-dash-gate-head h3,
+.usb-dash-brand {
+  margin: 0;
+  font-size: 26px;
+  letter-spacing: -0.04em;
+}
+.usb-dash-brand {
+  font-size: 22px;
+  font-weight: 600;
+}
+.usb-dash-sub,
+.usb-dash-note,
+.usb-dash .muted {
+  color: var(--muted);
+  font-size: 13px;
+}
+.usb-dash-note {
+  margin: 0 0 16px;
+}
+.usb-dash-top-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.usb-dash-pill {
+  border: 1px solid #292929;
+  border-radius: 999px;
+  padding: 7px 12px;
+  font-size: 12px;
+  color: #cfcfcf;
+}
+.usb-dash-tabs {
+  display: flex;
+  gap: 8px;
+  overflow: auto;
+  padding-bottom: 8px;
+  margin-bottom: 8px;
+}
+.usb-dash-tabs button {
+  background: transparent;
+  color: #eee;
+  border: 1px solid #292929;
+  border-radius: 999px;
+  padding: 8px 14px;
+  cursor: pointer;
+  font: inherit;
+  white-space: nowrap;
+}
+.usb-dash-tabs button.active {
+  background: #fff;
+  color: #000;
+  border-color: #fff;
+}
+.usb-dash-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 12px;
+}
+.usb-dash-card {
+  border: 1px solid #222;
+  border-radius: 14px;
+  background: #0a0a0a;
+  padding: 14px;
+}
+.usb-dash-card.wide {
+  grid-column: 1 / -1;
+}
+.usb-dash-card small {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+  margin-bottom: 8px;
+}
+.usb-dash-card strong {
+  font-size: 16px;
+  font-weight: 600;
+  word-break: break-word;
+}
+.usb-dash-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  margin-top: 16px;
+}
+.usb-dash-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 14px;
+}
+.usb-dash-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  width: 100%;
+  text-align: left;
+  border: 1px solid #222;
+  border-radius: 14px;
+  background: #0a0a0a;
+  color: inherit;
+  padding: 14px;
+  cursor: pointer;
+  font: inherit;
+}
+.usb-dash-item.static {
+  cursor: default;
+}
+.usb-dash-item span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.usb-dash-item em {
+  color: var(--muted);
+  font-style: normal;
+  font-size: 12px;
+  white-space: nowrap;
+}
+.usb-dash-item:not(.static):hover {
+  border-color: #3a3a3a;
+}
+.usb-dash-form {
+  display: grid;
+  gap: 12px;
+  max-width: 420px;
+}
+.usb-dash-form label {
+  display: grid;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 13px;
+}
+.usb-dash-form input,
+.usb-dash-modal-card input {
+  border: 1px solid #222;
+  border-radius: 10px;
+  background: #050505;
+  color: #f2f2f2;
+  padding: 10px 12px;
+  font: inherit;
+}
+.usb-dash-logs {
+  margin-top: 14px;
+  min-height: 280px;
+  max-height: 420px;
+  overflow: auto;
+  border: 1px solid #222;
+  border-radius: 12px;
+  background: #050505;
+  padding: 12px;
+  white-space: pre-wrap;
+  font-size: 12px;
+}
+.usb-dash-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background: rgba(0, 0, 0, 0.72);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+.usb-dash-modal-card {
+  width: min(420px, 100%);
+  border: 1px solid #292929;
+  border-radius: 16px;
+  background: #050505;
+  padding: 16px;
+  display: grid;
+  gap: 12px;
+}
+.usb-dash-modal-card small {
+  color: var(--muted);
+}
+.usb-dash-modal-card strong {
+  font-size: 18px;
+}
+
 .usb-actions {
   display: flex;
   flex-wrap: wrap;

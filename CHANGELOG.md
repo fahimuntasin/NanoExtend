@@ -4,6 +4,15 @@ All notable changes follow [Keep a Changelog](https://keepachangelog.com/) and [
 
 ## [Unreleased]
 
+## [1.0.3] - 2026-07-26
+
+### Added
+- Full USB dashboard (Home / Scan / Clients / Settings / System / Logs) over Web Serial.
+- SerialAdmin commands: `clients`, `logs`, `health`, `factory_reset`.
+
+### Changed
+- USB Setup panel upgraded to SoftAP-style dashboard UX.
+
 ## [1.0.2] - 2026-07-26
 
 ### Added

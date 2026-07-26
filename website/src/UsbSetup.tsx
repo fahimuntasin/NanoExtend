@@ -1,6 +1,5 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
 import {
-  Check,
   LoaderCircle,
   PlugZap,
   RefreshCw,
@@ -11,6 +10,7 @@ import {
 import { requestEspSerialPort, SERIAL_PORT_HINT } from "./serialPorts";
 
 type ConnState = "idle" | "connecting" | "ready" | "error";
+type TabId = "home" | "scan" | "clients" | "settings" | "system" | "logs";
 
 type ScanNetwork = {
   ssid: string;
@@ -19,19 +19,60 @@ type ScanNetwork = {
   encryption: number;
 };
 
+type WifiStatus = {
+  state?: string;
+  apSsid?: string;
+  apIp?: string;
+  apClients?: number;
+  staConnected?: boolean;
+  staSsid?: string;
+  rssi?: number;
+  staIp?: string;
+  gateway?: string;
+  dns?: string;
+  nat?: boolean;
+  sharing?: boolean;
+};
+
+type SystemStatus = {
+  firmware?: string;
+  uptimeSec?: number;
+  freeHeap?: number;
+  minFreeHeap?: number;
+  cpuMhz?: number;
+  sdk?: string;
+  resetReason?: string;
+  reconnectCount?: number;
+  lastError?: string;
+  flashSize?: number;
+  sketchSize?: number;
+  freeSketch?: number;
+  crashPending?: boolean;
+  crashText?: string;
+  health?: {
+    state?: string;
+    detail?: string;
+    dns?: boolean;
+    icmp?: boolean;
+    http?: boolean;
+    https?: boolean;
+  };
+};
+
 type StatusResult = {
   apIp?: string;
   staIp?: string;
-  wifi?: {
-    state?: string;
-    staSsid?: string;
-    rssi?: number;
-    sharing?: boolean;
-  };
-  system?: {
-    freeHeap?: number;
-    uptimeSec?: number;
-  };
+  wifi?: WifiStatus;
+  system?: SystemStatus;
+};
+
+type ClientRow = { mac?: string; rssi?: number; ip?: string; hostname?: string };
+
+type SettingsForm = {
+  apSsid: string;
+  apPass: string;
+  deviceName: string;
+  hostname: string;
 };
 
 type NeReply = {
@@ -42,6 +83,25 @@ type NeReply = {
   result?: Record<string, unknown>;
 };
 
+const tabs: { id: TabId; label: string }[] = [
+  { id: "home", label: "Home" },
+  { id: "scan", label: "Scan" },
+  { id: "clients", label: "Clients" },
+  { id: "settings", label: "Settings" },
+  { id: "system", label: "System" },
+  { id: "logs", label: "Logs" },
+];
+
+function formatUptime(sec?: number): string {
+  if (sec == null) return "—";
+  const d = Math.floor(sec / 86400);
+  const h = Math.floor((sec % 86400) / 3600);
+  const m = Math.floor((sec % 3600) / 60);
+  if (d > 0) return `${d}d ${h}h`;
+  if (h > 0) return `${h}h ${m}m`;
+  return `${m}m ${sec % 60}s`;
+}
+
 function encryptionLabel(enc: number): string {
   return enc === 0 ? "Open" : "Secured";
 }
@@ -49,16 +109,25 @@ function encryptionLabel(enc: number): string {
 function UsbSetup() {
   const [conn, setConn] = useState<ConnState>("idle");
   const [message, setMessage] = useState(
-    "Connect the ESP32 over USB. Chrome or Edge on desktop required.",
+    "Plug in the ESP32. This USB dashboard mirrors the SoftAP UI — no phone Wi‑Fi needed.",
   );
   const [fw, setFw] = useState("");
+  const [tab, setTab] = useState<TabId>("home");
   const [status, setStatus] = useState<StatusResult | null>(null);
   const [networks, setNetworks] = useState<ScanNetwork[]>([]);
+  const [clients, setClients] = useState<ClientRow[]>([]);
+  const [settings, setSettings] = useState<SettingsForm>({
+    apSsid: "",
+    apPass: "",
+    deviceName: "",
+    hostname: "",
+  });
+  const [logs, setLogs] = useState("");
   const [scanning, setScanning] = useState(false);
-  const [ssid, setSsid] = useState("");
-  const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
-  const [log, setLog] = useState<string[]>([]);
+  const [modalSsid, setModalSsid] = useState<string | null>(null);
+  const [modalPass, setModalPass] = useState("");
+  const [modalStatus, setModalStatus] = useState("");
 
   const portRef = useRef<SerialPort | null>(null);
   const readerRef = useRef<ReadableStreamDefaultReader<Uint8Array> | null>(null);
@@ -78,10 +147,6 @@ function UsbSetup() {
   const nextIdRef = useRef(1);
   const pollRef = useRef<number | null>(null);
   const supported = "serial" in navigator;
-
-  const addLog = useCallback((line: string) => {
-    setLog((current) => [...current.slice(-24), line]);
-  }, []);
 
   const cleanupPort = useCallback(async () => {
     if (pollRef.current) {
@@ -116,27 +181,19 @@ function UsbSetup() {
     }
   }, []);
 
-  const handleLine = useCallback(
-    (line: string) => {
-      if (!line.startsWith("NE{")) {
-        if (line.includes("NanoExtend") || line.includes("[SerialAdmin]")) {
-          addLog(line);
-        }
-        return;
-      }
-      try {
-        const reply = JSON.parse(line.slice(2)) as NeReply;
-        const pending = pendingRef.current.get(reply.id);
-        if (!pending) return;
-        window.clearTimeout(pending.timer);
-        pendingRef.current.delete(reply.id);
-        pending.resolve(reply);
-      } catch {
-        addLog(`Bad reply: ${line}`);
-      }
-    },
-    [addLog],
-  );
+  const handleLine = useCallback((line: string) => {
+    if (!line.startsWith("NE{")) return;
+    try {
+      const reply = JSON.parse(line.slice(2)) as NeReply;
+      const pending = pendingRef.current.get(reply.id);
+      if (!pending) return;
+      window.clearTimeout(pending.timer);
+      pendingRef.current.delete(reply.id);
+      pending.resolve(reply);
+    } catch {
+      /* ignore malformed */
+    }
+  }, []);
 
   const readLoop = useCallback(
     async (reader: ReadableStreamDefaultReader<Uint8Array>) => {
@@ -154,7 +211,7 @@ function UsbSetup() {
           }
         }
       } catch {
-        /* port closed */
+        /* closed */
       }
     },
     [handleLine],
@@ -165,29 +222,23 @@ function UsbSetup() {
       const writer = writerRef.current;
       if (!writer) throw new Error("USB serial is not connected.");
       const id = nextIdRef.current++;
-      const payload = JSON.stringify({ v: 1, id, cmd, ...extra });
-      const line = `NE>${payload}\n`;
-      addLog(`→ ${cmd}`);
+      const line = `NE>${JSON.stringify({ v: 1, id, cmd, ...extra })}\n`;
       const reply = await new Promise<NeReply>((resolve, reject) => {
         const timer = window.setTimeout(() => {
           pendingRef.current.delete(id);
           reject(new Error(`Timeout waiting for ${cmd}`));
         }, timeoutMs);
         pendingRef.current.set(id, { resolve, reject, timer });
-        writer
-          .write(new TextEncoder().encode(line))
-          .catch((error) => {
-            window.clearTimeout(timer);
-            pendingRef.current.delete(id);
-            reject(error);
-          });
+        writer.write(new TextEncoder().encode(line)).catch((error) => {
+          window.clearTimeout(timer);
+          pendingRef.current.delete(id);
+          reject(error);
+        });
       });
-      if (!reply.ok) {
-        throw new Error(reply.error || `${cmd} failed`);
-      }
+      if (!reply.ok) throw new Error(reply.error || `${cmd} failed`);
       return reply.result ?? {};
     },
-    [addLog],
+    [],
   );
 
   const refreshStatus = useCallback(async () => {
@@ -220,6 +271,31 @@ function UsbSetup() {
     [request],
   );
 
+  const refreshClients = useCallback(async () => {
+    const result = (await request("clients")) as { clients?: ClientRow[] };
+    setClients(result.clients ?? []);
+  }, [request]);
+
+  const refreshSettings = useCallback(async () => {
+    const result = (await request("settings_get")) as Partial<SettingsForm>;
+    setSettings({
+      apSsid: result.apSsid ?? "",
+      apPass: result.apPass ?? "",
+      deviceName: result.deviceName ?? "",
+      hostname: result.hostname ?? "",
+    });
+  }, [request]);
+
+  const refreshLogs = useCallback(async () => {
+    const result = (await request("logs", {}, 10000)) as {
+      text?: string;
+      truncated?: boolean;
+    };
+    setLogs(
+      `${result.truncated ? "…truncated…\n" : ""}${result.text ?? "(empty)"}`,
+    );
+  }, [request]);
+
   const connectUsb = async () => {
     if (!supported) {
       setConn("error");
@@ -236,13 +312,10 @@ function UsbSetup() {
       portRef.current = port;
       bufferRef.current = "";
       decoderRef.current = new TextDecoder();
-
       if (!port.readable || !port.writable) {
         throw new Error("Serial port streams are unavailable.");
       }
-      const reader = (
-        port.readable as ReadableStream<Uint8Array>
-      ).getReader();
+      const reader = (port.readable as ReadableStream<Uint8Array>).getReader();
       readerRef.current = reader;
       void readLoop(reader);
       writerRef.current = (
@@ -250,7 +323,7 @@ function UsbSetup() {
       ).getWriter();
 
       let hello: Record<string, unknown> | null = null;
-      for (let attempt = 0; attempt < 8; attempt++) {
+      for (let attempt = 0; attempt < 10; attempt++) {
         try {
           hello = await request("hello", {}, 2000);
           break;
@@ -258,17 +331,20 @@ function UsbSetup() {
           await new Promise((r) => window.setTimeout(r, 400));
         }
       }
-      if (!hello) throw new Error("No reply from NanoExtend. Is firmware 1.0.2+ flashed?");
+      if (!hello) {
+        throw new Error("No reply from NanoExtend. Flash firmware 1.0.3+ first.");
+      }
 
       setFw(String(hello.fw ?? ""));
       setConn("ready");
-      setMessage("USB setup ready. Scan Wi-Fi and connect upstream — no phone needed.");
+      setMessage("USB dashboard live — same controls as SoftAP, over the cable.");
       await refreshStatus();
       await refreshScan(true);
+      await refreshSettings();
 
       pollRef.current = window.setInterval(() => {
         void refreshStatus().catch(() => undefined);
-      }, 4000);
+      }, 2500);
     } catch (error) {
       await cleanupPort();
       setConn("error");
@@ -284,50 +360,72 @@ function UsbSetup() {
     setConn("idle");
     setStatus(null);
     setNetworks([]);
+    setClients([]);
+    setLogs("");
     setFw("");
-    setMessage("Disconnected. Reconnect USB anytime to configure NanoExtend.");
+    setMessage("Disconnected. Reconnect USB to open the dashboard again.");
     setBusy(false);
   };
 
   const connectWifi = async () => {
-    if (!ssid.trim()) {
-      setMessage("Choose or enter a Wi-Fi network.");
-      return;
-    }
+    if (!modalSsid) return;
     setBusy(true);
-    setMessage(`Connecting to ${ssid}…`);
+    setModalStatus(`Connecting to ${modalSsid}…`);
     try {
-      await request("connect", { ssid: ssid.trim(), password }, 25000);
-      setMessage(`Connect accepted for ${ssid}. Waiting for STA IP…`);
+      await request(
+        "connect",
+        { ssid: modalSsid, password: modalPass },
+        25000,
+      );
+      setModalStatus("Accepted. Waiting for STA…");
       for (let i = 0; i < 12; i++) {
         await new Promise((r) => window.setTimeout(r, 1000));
         const st = await refreshStatus();
         if (st.staIp) {
-          setMessage(
-            `Upstream connected. SoftAP dashboard remains at http://${st.apIp || "192.168.4.1"} — join the NanoExtend Wi-Fi from this PC if you want the full UI.`,
-          );
+          setModalStatus(`Connected · ${st.staIp}`);
           break;
         }
       }
+      window.setTimeout(() => {
+        setModalSsid(null);
+        setModalPass("");
+        setModalStatus("");
+      }, 800);
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : "Connect failed.");
+      setModalStatus(error instanceof Error ? error.message : "Connect failed.");
     } finally {
       setBusy(false);
     }
   };
 
-  const disconnectWifi = async () => {
+  const saveSettings = async (event: FormEvent) => {
+    event.preventDefault();
     setBusy(true);
     try {
-      await request("disconnect");
+      await request("settings_set", settings);
+      setMessage("Settings saved.");
       await refreshStatus();
-      setMessage("Upstream Wi-Fi disconnected.");
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : "Disconnect failed.");
+      setMessage(error instanceof Error ? error.message : "Save failed.");
     } finally {
       setBusy(false);
     }
   };
+
+  useEffect(() => {
+    if (conn !== "ready") return;
+    if (tab === "clients") void refreshClients().catch(() => undefined);
+    if (tab === "logs") void refreshLogs().catch(() => undefined);
+    if (tab === "settings") void refreshSettings().catch(() => undefined);
+    if (tab === "scan") void refreshScan(false).catch(() => undefined);
+  }, [
+    tab,
+    conn,
+    refreshClients,
+    refreshLogs,
+    refreshSettings,
+    refreshScan,
+  ]);
 
   useEffect(() => {
     return () => {
@@ -335,33 +433,33 @@ function UsbSetup() {
     };
   }, [cleanupPort]);
 
+  const wifi = status?.wifi;
+  const sys = status?.system;
+
   return (
-    <div className="installer-shell usb-setup-shell">
-      <div className="installer-head">
-        <div>
-          <span className="eyebrow">USB setup</span>
-          <h3>Configure without a phone.</h3>
-        </div>
-        <div className={`device-pill ${conn === "ready" ? "is-ready" : ""}`}>
-          <Usb size={15} aria-hidden="true" />
-          {conn === "ready" ? `USB · ${fw || "ready"}` : "Waiting for USB"}
-        </div>
-      </div>
-
-      <p className={conn === "error" ? "installer-error" : "installer-message"}>
-        {message}
-      </p>
-
-      <aside className="usb-port-hint" aria-label="Serial port tip">
-        <strong>Which port?</strong>
-        <span>
-          Pick <em>USB Serial</em> / <em>CH340</em> / <em>CP210x</em>. Skip{" "}
-          <em>ttyS0–ttyS15</em> — those belong to the PC, not the ESP32.
-        </span>
-      </aside>
-
-      <div className="usb-actions">
-        {conn !== "ready" ? (
+    <div className="usb-dash">
+      {conn !== "ready" ? (
+        <div className="usb-dash-gate">
+          <div className="usb-dash-gate-head">
+            <div>
+              <span className="eyebrow">USB dashboard</span>
+              <h3>Same SoftAP UI. Over the cable.</h3>
+            </div>
+            <div className="device-pill">
+              <Usb size={15} aria-hidden="true" />
+              Waiting for USB
+            </div>
+          </div>
+          <p className={conn === "error" ? "installer-error" : "installer-message"}>
+            {message}
+          </p>
+          <aside className="usb-port-hint" aria-label="Serial port tip">
+            <strong>Which port?</strong>
+            <span>
+              Pick <em>USB Serial</em> / <em>CH340</em> / <em>CP210x</em>. Skip{" "}
+              <em>ttyS0–ttyS15</em> — those belong to the PC, not the ESP32.
+            </span>
+          </aside>
           <button
             className="button primary installer-button"
             disabled={!supported || busy || conn === "connecting"}
@@ -373,135 +471,439 @@ function UsbSetup() {
             ) : (
               <PlugZap size={17} aria-hidden="true" />
             )}
-            Connect USB and setup
+            Connect USB dashboard
           </button>
-        ) : (
-          <button
-            className="button secondary installer-button"
-            disabled={busy}
-            onClick={() => void disconnectUsb()}
-            type="button"
-          >
-            <Unplug size={17} aria-hidden="true" />
-            Disconnect USB
-          </button>
-        )}
-      </div>
-
-      {conn === "ready" && status && (
-        <div className="usb-status-grid" aria-live="polite">
-          <div>
-            <small>Wi-Fi state</small>
-            <strong>{status.wifi?.state ?? "—"}</strong>
-          </div>
-          <div>
-            <small>Upstream SSID</small>
-            <strong>{status.wifi?.staSsid || "Not connected"}</strong>
-          </div>
-          <div>
-            <small>STA IP</small>
-            <strong>{status.staIp || "—"}</strong>
-          </div>
-          <div>
-            <small>SoftAP IP</small>
-            <strong>{status.apIp || "192.168.4.1"}</strong>
-          </div>
         </div>
-      )}
-
-      {conn === "ready" && (
-        <div className="usb-wifi-panel">
-          <div className="usb-wifi-toolbar">
-            <strong>Upstream networks</strong>
-            <button
-              className="button secondary"
-              disabled={busy || scanning}
-              onClick={() => void refreshScan(true).catch((error) => {
-                setMessage(
-                  error instanceof Error ? error.message : "Scan failed.",
-                );
-              })}
-              type="button"
-            >
-              {scanning ? (
-                <LoaderCircle className="spin" size={16} aria-hidden="true" />
-              ) : (
-                <RefreshCw size={16} aria-hidden="true" />
-              )}
-              Rescan
-            </button>
-          </div>
-
-          <div className="usb-network-list" role="list">
-            {networks.length === 0 && (
-              <p className="usb-empty">
-                {scanning ? "Scanning…" : "No networks yet. Tap Rescan."}
-              </p>
-            )}
-            {networks.map((net) => (
+      ) : (
+        <>
+          <header className="usb-dash-top">
+            <div>
+              <div className="usb-dash-brand">NanoExtend</div>
+              <div className="usb-dash-sub">
+                USB · {fw || "ready"} · {wifi?.state ?? "—"}
+              </div>
+            </div>
+            <div className="usb-dash-top-actions">
+              <span className="usb-dash-pill">
+                {status?.staIp || status?.apIp || "192.168.4.1"}
+              </span>
               <button
-                className={`usb-network ${ssid === net.ssid ? "selected" : ""}`}
-                key={`${net.ssid}-${net.channel}-${net.rssi}`}
-                onClick={() => setSsid(net.ssid)}
-                role="listitem"
+                className="button secondary"
+                disabled={busy}
+                onClick={() => void disconnectUsb()}
                 type="button"
               >
-                <span>
-                  <Wifi size={15} aria-hidden="true" />
-                  {net.ssid || "(hidden)"}
-                </span>
-                <em>
-                  {net.rssi} dBm · {encryptionLabel(net.encryption)}
-                </em>
+                <Unplug size={15} aria-hidden="true" />
+                Disconnect
+              </button>
+            </div>
+          </header>
+
+          <nav className="usb-dash-tabs" aria-label="USB dashboard tabs">
+            {tabs.map((item) => (
+              <button
+                className={tab === item.id ? "active" : ""}
+                key={item.id}
+                onClick={() => setTab(item.id)}
+                type="button"
+              >
+                {item.label}
               </button>
             ))}
-          </div>
+          </nav>
 
-          <label className="usb-field">
-            <span>SSID</span>
-            <input
-              autoComplete="off"
-              onChange={(e) => setSsid(e.target.value)}
-              value={ssid}
-            />
-          </label>
-          <label className="usb-field">
-            <span>Password</span>
-            <input
-              autoComplete="new-password"
-              onChange={(e) => setPassword(e.target.value)}
-              type="password"
-              value={password}
-            />
-          </label>
+          <p className="usb-dash-note">{message}</p>
 
-          <div className="usb-actions">
-            <button
-              className="button primary"
-              disabled={busy || !ssid.trim()}
-              onClick={() => void connectWifi()}
-              type="button"
-            >
-              <Check size={16} aria-hidden="true" />
-              Connect upstream Wi-Fi
-            </button>
-            <button
-              className="button secondary"
-              disabled={busy}
-              onClick={() => void disconnectWifi()}
-              type="button"
-            >
-              Disconnect STA
-            </button>
-          </div>
-        </div>
+          {tab === "home" && (
+            <section className="usb-dash-panel">
+              <div className="usb-dash-grid">
+                <div className="usb-dash-card">
+                  <small>Connection</small>
+                  <strong>{wifi?.state ?? "—"}</strong>
+                </div>
+                <div className="usb-dash-card">
+                  <small>Upstream SSID</small>
+                  <strong>{wifi?.staSsid || "Not connected"}</strong>
+                </div>
+                <div className="usb-dash-card">
+                  <small>RSSI</small>
+                  <strong>
+                    {wifi?.staConnected ? `${wifi.rssi} dBm` : "—"}
+                  </strong>
+                </div>
+                <div className="usb-dash-card">
+                  <small>STA IP</small>
+                  <strong>{status?.staIp || "—"}</strong>
+                </div>
+                <div className="usb-dash-card">
+                  <small>Gateway</small>
+                  <strong>{wifi?.gateway || "—"}</strong>
+                </div>
+                <div className="usb-dash-card">
+                  <small>DNS</small>
+                  <strong>{wifi?.dns || "—"}</strong>
+                </div>
+                <div className="usb-dash-card">
+                  <small>NAT / Sharing</small>
+                  <strong>
+                    {wifi?.nat ? "NAT on" : "NAT off"}
+                    {wifi?.sharing ? " · sharing" : ""}
+                  </strong>
+                </div>
+                <div className="usb-dash-card">
+                  <small>Internet</small>
+                  <strong>{sys?.health?.state ?? "—"}</strong>
+                </div>
+                <div className="usb-dash-card">
+                  <small>AP clients</small>
+                  <strong>{wifi?.apClients ?? 0}</strong>
+                </div>
+                <div className="usb-dash-card">
+                  <small>Uptime</small>
+                  <strong>{formatUptime(sys?.uptimeSec)}</strong>
+                </div>
+                <div className="usb-dash-card">
+                  <small>Free heap</small>
+                  <strong>
+                    {sys?.freeHeap != null
+                      ? `${Math.round(sys.freeHeap / 1024)} KB`
+                      : "—"}
+                  </strong>
+                </div>
+                <div className="usb-dash-card">
+                  <small>Reconnects</small>
+                  <strong>{sys?.reconnectCount ?? 0}</strong>
+                </div>
+                <div className="usb-dash-card wide">
+                  <small>Last error</small>
+                  <strong>{sys?.lastError || "none"}</strong>
+                </div>
+              </div>
+              <div className="usb-dash-row">
+                <button
+                  className="button secondary"
+                  disabled={busy || scanning}
+                  onClick={() => {
+                    setTab("scan");
+                    void refreshScan(true);
+                  }}
+                  type="button"
+                >
+                  <Wifi size={15} /> Scan
+                </button>
+                <button
+                  className="button secondary"
+                  disabled={busy}
+                  onClick={() =>
+                    void request("disconnect")
+                      .then(() => refreshStatus())
+                      .catch((error) =>
+                        setMessage(
+                          error instanceof Error
+                            ? error.message
+                            : "Disconnect failed.",
+                        ),
+                      )
+                  }
+                  type="button"
+                >
+                  Disconnect STA
+                </button>
+                <button
+                  className="button secondary"
+                  disabled={busy}
+                  onClick={() =>
+                    void request("reboot")
+                      .then(() => setMessage("Rebooting… reconnect USB after boot."))
+                      .catch((error) =>
+                        setMessage(
+                          error instanceof Error ? error.message : "Reboot failed.",
+                        ),
+                      )
+                  }
+                  type="button"
+                >
+                  Restart
+                </button>
+              </div>
+            </section>
+          )}
+
+          {tab === "scan" && (
+            <section className="usb-dash-panel">
+              <div className="usb-dash-row">
+                <button
+                  className="button secondary"
+                  disabled={busy || scanning}
+                  onClick={() => void refreshScan(true).catch((error) => {
+                    setMessage(
+                      error instanceof Error ? error.message : "Scan failed.",
+                    );
+                  })}
+                  type="button"
+                >
+                  {scanning ? (
+                    <LoaderCircle className="spin" size={15} />
+                  ) : (
+                    <RefreshCw size={15} />
+                  )}
+                  Refresh
+                </button>
+                <span className="muted">
+                  {scanning ? "Scanning…" : `${networks.length} networks`}
+                </span>
+              </div>
+              <div className="usb-dash-list">
+                {networks.map((net) => (
+                  <button
+                    className="usb-dash-item"
+                    key={`${net.ssid}-${net.channel}-${net.rssi}`}
+                    onClick={() => {
+                      setModalSsid(net.ssid);
+                      setModalPass("");
+                      setModalStatus("");
+                    }}
+                    type="button"
+                  >
+                    <span>
+                      <Wifi size={15} /> {net.ssid || "(hidden)"}
+                    </span>
+                    <em>
+                      {net.rssi} dBm · {encryptionLabel(net.encryption)}
+                    </em>
+                  </button>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {tab === "clients" && (
+            <section className="usb-dash-panel">
+              <div className="usb-dash-row">
+                <button
+                  className="button secondary"
+                  disabled={busy}
+                  onClick={() => void refreshClients()}
+                  type="button"
+                >
+                  <RefreshCw size={15} /> Refresh
+                </button>
+              </div>
+              <div className="usb-dash-list">
+                {clients.length === 0 && (
+                  <p className="muted">No SoftAP clients connected.</p>
+                )}
+                {clients.map((client, index) => (
+                  <div className="usb-dash-item static" key={client.mac ?? index}>
+                    <span>{client.mac || "unknown"}</span>
+                    <em>{client.ip || "—"}</em>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {tab === "settings" && (
+            <section className="usb-dash-panel">
+              <form className="usb-dash-form" onSubmit={(e) => void saveSettings(e)}>
+                <label>
+                  AP Name
+                  <input
+                    maxLength={32}
+                    onChange={(e) =>
+                      setSettings((s) => ({ ...s, apSsid: e.target.value }))
+                    }
+                    required
+                    value={settings.apSsid}
+                  />
+                </label>
+                <label>
+                  AP Password
+                  <input
+                    maxLength={63}
+                    minLength={8}
+                    onChange={(e) =>
+                      setSettings((s) => ({ ...s, apPass: e.target.value }))
+                    }
+                    required
+                    type="password"
+                    value={settings.apPass}
+                  />
+                </label>
+                <label>
+                  Device Name
+                  <input
+                    maxLength={32}
+                    onChange={(e) =>
+                      setSettings((s) => ({ ...s, deviceName: e.target.value }))
+                    }
+                    required
+                    value={settings.deviceName}
+                  />
+                </label>
+                <label>
+                  Hostname
+                  <input
+                    maxLength={32}
+                    onChange={(e) =>
+                      setSettings((s) => ({ ...s, hostname: e.target.value }))
+                    }
+                    required
+                    value={settings.hostname}
+                  />
+                </label>
+                <button className="button primary" disabled={busy} type="submit">
+                  Save
+                </button>
+              </form>
+            </section>
+          )}
+
+          {tab === "system" && (
+            <section className="usb-dash-panel">
+              <div className="usb-dash-grid">
+                <div className="usb-dash-card">
+                  <small>Firmware</small>
+                  <strong>{sys?.firmware ?? fw}</strong>
+                </div>
+                <div className="usb-dash-card">
+                  <small>SDK</small>
+                  <strong>{sys?.sdk ?? "—"}</strong>
+                </div>
+                <div className="usb-dash-card">
+                  <small>CPU</small>
+                  <strong>
+                    {sys?.cpuMhz != null ? `${sys.cpuMhz} MHz` : "—"}
+                  </strong>
+                </div>
+                <div className="usb-dash-card">
+                  <small>Flash</small>
+                  <strong>
+                    {sys?.flashSize != null
+                      ? `${Math.round(sys.flashSize / 1048576)} MB`
+                      : "—"}
+                  </strong>
+                </div>
+                <div className="usb-dash-card">
+                  <small>Reset</small>
+                  <strong>{sys?.resetReason ?? "—"}</strong>
+                </div>
+                <div className="usb-dash-card">
+                  <small>Crash</small>
+                  <strong>
+                    {sys?.crashPending ? sys.crashText || "pending" : "none"}
+                  </strong>
+                </div>
+                <div className="usb-dash-card wide">
+                  <small>Health</small>
+                  <strong>
+                    {sys?.health?.detail || sys?.health?.state || "—"}
+                  </strong>
+                </div>
+              </div>
+              <div className="usb-dash-row">
+                <button
+                  className="button secondary"
+                  disabled={busy}
+                  onClick={() =>
+                    void request("health")
+                      .then(() => refreshStatus())
+                      .then(() => setMessage("Health check requested."))
+                  }
+                  type="button"
+                >
+                  Run health check
+                </button>
+                <button
+                  className="button secondary"
+                  disabled={busy}
+                  onClick={() => {
+                    if (
+                      !window.confirm(
+                        "Factory reset clears Wi-Fi and AP settings. Continue?",
+                      )
+                    ) {
+                      return;
+                    }
+                    void request("factory_reset", { confirm: true })
+                      .then(() =>
+                        setMessage("Factory reset done. Reconnect after reboot."),
+                      )
+                      .catch((error) =>
+                        setMessage(
+                          error instanceof Error
+                            ? error.message
+                            : "Factory reset failed.",
+                        ),
+                      );
+                  }}
+                  type="button"
+                >
+                  Factory Reset
+                </button>
+              </div>
+              <p className="muted" style={{ marginTop: 16 }}>
+                OTA uploads still use SoftAP dashboard or the browser installer.
+              </p>
+            </section>
+          )}
+
+          {tab === "logs" && (
+            <section className="usb-dash-panel">
+              <div className="usb-dash-row">
+                <button
+                  className="button secondary"
+                  disabled={busy}
+                  onClick={() => void refreshLogs()}
+                  type="button"
+                >
+                  <RefreshCw size={15} /> Refresh
+                </button>
+              </div>
+              <pre className="usb-dash-logs">{logs || "No logs yet."}</pre>
+            </section>
+          )}
+        </>
       )}
 
-      {log.length > 0 && (
-        <details className="install-log">
-          <summary>USB serial log</summary>
-          <pre>{log.join("\n")}</pre>
-        </details>
+      {modalSsid && (
+        <div className="usb-dash-modal" role="dialog" aria-modal="true">
+          <div className="usb-dash-modal-card">
+            <small>Connect</small>
+            <strong>{modalSsid}</strong>
+            <input
+              autoComplete="new-password"
+              maxLength={63}
+              minLength={8}
+              onChange={(e) => setModalPass(e.target.value)}
+              placeholder="Password"
+              type="password"
+              value={modalPass}
+            />
+            <div className="usb-dash-row">
+              <button
+                className="button primary"
+                disabled={busy || modalPass.length < 8}
+                onClick={() => void connectWifi()}
+                type="button"
+              >
+                Connect
+              </button>
+              <button
+                className="button secondary"
+                onClick={() => {
+                  setModalSsid(null);
+                  setModalPass("");
+                  setModalStatus("");
+                }}
+                type="button"
+              >
+                Cancel
+              </button>
+            </div>
+            {modalStatus && <p className="muted">{modalStatus}</p>}
+          </div>
+        </div>
       )}
     </div>
   );

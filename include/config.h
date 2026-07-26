@@ -4,7 +4,7 @@
 
 #define NANOEXTEND_NAME "NanoExtend"
 #ifndef NANOEXTEND_FW_VERSION
-#define NANOEXTEND_FW_VERSION "1.0.2"
+#define NANOEXTEND_FW_VERSION "1.0.3"
 #endif
 
 // SoftAP defaults
