@@ -19,6 +19,12 @@ const stepOrder: InstallState[] = [
   "done",
 ];
 
+function assetUrl(path: string): string {
+  if (/^https?:\/\//i.test(path)) return path;
+  const base = import.meta.env.BASE_URL;
+  return `${base}${path.replace(/^\//, "")}`;
+}
+
 function Installer() {
   const [state, setState] = useState<InstallState>("idle");
   const [progress, setProgress] = useState(0);
@@ -68,7 +74,7 @@ function Installer() {
 
       setState("downloading");
       setMessage("Downloading the verified NanoExtend factory image…");
-      const manifestResponse = await fetch("/firmware/manifest.json", {
+      const manifestResponse = await fetch(assetUrl("firmware/manifest.json"), {
         cache: "no-store",
       });
       if (!manifestResponse.ok) {
@@ -89,7 +95,7 @@ function Installer() {
       if (!factory.file || !factory.sha256) {
         throw new Error("The release manifest has no factory image.");
       }
-      const firmwareResponse = await fetch(factory.file, {
+      const firmwareResponse = await fetch(assetUrl(factory.file), {
         cache: "no-store",
       });
       if (!firmwareResponse.ok) {

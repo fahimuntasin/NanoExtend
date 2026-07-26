@@ -29,8 +29,9 @@ fonts are the fallback. Monospace metadata uses the platform UI monospace stack.
 
 ## Motion
 
-The animated mark draws the routed “N”, pulses the Wi-Fi arcs, and softly
-illuminates circuit nodes. Motion respects `prefers-reduced-motion`.
+The animated mark draws the routed “N”, blinks a circuit trace, breathes a soft
+signal aura, pulses three Wi-Fi arcs, and illuminates circuit nodes. Motion
+respects `prefers-reduced-motion`.
 
 ## Usage
 

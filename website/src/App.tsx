@@ -28,6 +28,8 @@ import Installer from "./Installer";
 import Logo from "./Logo";
 
 const repoUrl = "https://github.com/fahimuntasin/NanoExtend";
+const siteUrl = "https://fahimuntasin.github.io/NanoExtend/";
+const openApiUrl = `${import.meta.env.BASE_URL}api/openapi.yaml`;
 
 const features = [
   [
@@ -73,7 +75,9 @@ function App() {
         <nav aria-label="Main navigation">
           <a href="#features">Features</a>
           <a href="#installer">Install</a>
+          <a href="#ota">OTA</a>
           <a href="#docs">Docs</a>
+          <a href="#faq">FAQ</a>
           <a href="#roadmap">Roadmap</a>
         </nav>
         <a
@@ -92,7 +96,7 @@ function App() {
           <div className="hero-copy">
             <div className="release-pill">
               <span />
-              NanoExtend 1.0 · Open source
+              NanoExtend 1.0.1 · Open source
               <ArrowRight size={14} aria-hidden="true" />
             </div>
             <h1>
@@ -317,7 +321,7 @@ function App() {
           <Installer />
         </section>
 
-        <section className="section ota-section">
+        <section className="section ota-section" id="ota">
           <div className="ota-copy">
             <span className="eyebrow">Update center</span>
             <h2>Updates that earn your trust.</h2>
@@ -347,20 +351,23 @@ function App() {
                 <CloudDownload size={23} />
               </div>
               <div>
-                <strong>NanoExtend 1.1.0</strong>
-                <span>Ready to install</span>
+                <strong>NanoExtend 1.0.1</strong>
+                <span>Current stable release</span>
               </div>
               <b>Stable</b>
             </div>
-            <p>Improved network recovery and a faster dashboard.</p>
+            <p>
+              GitHub Releases as the default OTA source, SHA-256 verification,
+              and dual-slot rollback.
+            </p>
             <div className="update-meta">
-              <span>1.21 MB</span>
+              <span>1.22 MB</span>
               <span>SHA-256 verified</span>
-              <span>2 min</span>
+              <span>GitHub Releases</span>
             </div>
-            <button className="button primary" type="button">
-              Install update <ArrowRight size={16} />
-            </button>
+            <a className="button primary" href={`${repoUrl}/releases/latest`}>
+              View release <ArrowRight size={16} />
+            </a>
           </div>
         </section>
 
@@ -387,7 +394,7 @@ function App() {
                 Code2,
                 "API reference",
                 "Versioned REST and WebSocket contracts with OpenAPI.",
-                "/api/openapi.yaml",
+                openApiUrl,
               ],
               [
                 ShieldCheck,
@@ -444,7 +451,7 @@ function App() {
           </div>
         </section>
 
-        <section className="section faq-section">
+        <section className="section faq-section" id="faq">
           <div className="section-heading">
             <span className="eyebrow">FAQ</span>
             <h2>Answers before you plug in.</h2>
@@ -516,7 +523,8 @@ function App() {
           <div>
             <strong>Resources</strong>
             <a href="#docs">Documentation</a>
-            <a href="/api/openapi.yaml">OpenAPI</a>
+            <a href={openApiUrl}>OpenAPI</a>
+            <a href={siteUrl}>GitHub Pages</a>
             <a href={`${repoUrl}/discussions`}>Discussions</a>
           </div>
           <div>

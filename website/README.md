@@ -1,26 +1,30 @@
 # NanoExtend Website
 
-Production React + TypeScript + Tailwind CSS site for NanoExtend. It includes the landing page, original animated brand, responsive dashboard preview, documentation links, and an `esptool-js` Web Serial installer.
+React + Tailwind static site for GitHub Pages.
 
-## Development
+## Local development
 
 ```bash
 npm ci
-npm run dev
-```
-
-## Verification
-
-```bash
 npm run typecheck
-npm run format:check
 npm run build
+npm run preview
 ```
 
-The browser installer expects `public/firmware/manifest.json` plus the factory image named by that manifest. Release and Cloudflare workflows generate these from the pinned PlatformIO firmware build. Generated `.bin` files are intentionally ignored by Git.
+Vite uses `base: "/NanoExtend/"` so production assets match
+`https://fahimuntasin.github.io/NanoExtend/`.
+
+## Installer firmware
+
+The browser installer expects `public/firmware/manifest.json` plus the factory
+image named by that manifest. The GitHub Pages workflow builds firmware with
+PlatformIO and packages those artifacts into the site. Generated `.bin` files
+are intentionally ignored by Git.
 
 ## Deployment
 
-Cloudflare Pages uses `wrangler.toml` and the repository workflow. Configure `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, and optionally `CLOUDFLARE_PROJECT_NAME`. Web Serial requires HTTPS (localhost is allowed during development).
+GitHub Actions workflow `.github/workflows/github-pages.yml` builds the firmware
+artifacts, builds the site, and deploys to GitHub Pages. Web Serial requires
+HTTPS (localhost is allowed during development).
 
-Security headers and CORS for release manifests are defined in `public/_headers`.
+SPA deep links use a `404.html` fallback generated from `index.html`.

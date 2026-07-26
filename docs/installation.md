@@ -2,7 +2,7 @@
 
 ## Web installer
 
-The React website uses Web Serial and `esptool-js`. It verifies the release manifest size and SHA-256 before writing the merged factory image at address `0x0`.
+Open [https://fahimuntasin.github.io/NanoExtend/](https://fahimuntasin.github.io/NanoExtend/) in Chrome or Edge. The React website uses Web Serial and `esptool-js`. It verifies the release manifest size and SHA-256 before writing the merged factory image at address `0x0`.
 
 ## PlatformIO
 

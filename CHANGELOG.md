@@ -4,6 +4,14 @@ All notable changes follow [Keep a Changelog](https://keepachangelog.com/) and [
 
 ## [Unreleased]
 
+### Changed
+- Upgraded the animated NanoExtend mark with circuit-trace motion, signal arcs, and reduced-motion support.
+- Refreshed landing-page branding, SEO assets, and installer firmware packaging for 1.0.1.
+- Replaced Cloudflare Pages deployment with GitHub Pages hosting.
+
+### Added
+- Automatic GitHub Pages workflow that builds firmware installer artifacts and deploys the site.
+
 ## [1.0.1] - 2026-07-23
 
 ### Fixed

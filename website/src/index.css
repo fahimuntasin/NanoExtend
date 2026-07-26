@@ -947,23 +947,47 @@ footer {
 
 .nano-logo {
   overflow: visible;
+  color: #fff;
 }
 .logo-frame {
-  stroke-dasharray: 140;
+  stroke-dasharray: 160;
   stroke-dashoffset: 0;
 }
+.logo-trace {
+  opacity: 0.75;
+}
+.logo-aura {
+  opacity: 0.55;
+}
 .nano-logo-animated .logo-frame {
-  animation: logoDraw 4s ease-in-out infinite;
+  animation: logoDraw 3.6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+.nano-logo-animated .logo-trace {
+  animation: traceBlink 2.8s ease-in-out infinite;
+}
+.nano-logo-animated .logo-aura {
+  animation: auraBreathe 3.2s ease-in-out infinite;
+  transform-origin: 70px 28px;
 }
 .nano-logo-animated .logo-wave {
-  animation: wavePulse 2.2s ease-in-out infinite;
-  transform-origin: 58px 28px;
+  animation: wavePulse 2s ease-in-out infinite;
+  transform-origin: 56px 20px;
 }
 .nano-logo-animated .wave-two {
-  animation-delay: 0.22s;
+  animation-delay: 0.18s;
+}
+.nano-logo-animated .wave-three {
+  animation-delay: 0.36s;
+  stroke-width: 4.5;
 }
 .nano-logo-animated .logo-node {
-  animation: nodeGlow 2.2s ease-in-out infinite;
+  animation: nodeGlow 2s ease-in-out infinite;
+}
+.nano-logo-animated .logo-core {
+  animation: corePulse 1.6s ease-in-out infinite;
+}
+.nano-logo-animated .logo-core-b {
+  animation-delay: 0.35s;
 }
 
 @keyframes orbitSpin {
@@ -982,35 +1006,85 @@ footer {
   }
 }
 @keyframes logoDraw {
-  0%,
-  100% {
+  0% {
+    stroke-dashoffset: 160;
+    opacity: 0.35;
+  }
+  28%,
+  72% {
     stroke-dashoffset: 0;
     opacity: 1;
   }
-  50% {
-    stroke-dashoffset: 22;
-    opacity: 0.7;
+  100% {
+    stroke-dashoffset: 160;
+    opacity: 0.35;
   }
 }
 @keyframes wavePulse {
   0%,
   100% {
-    opacity: 0.35;
-    transform: scale(0.94);
+    opacity: 0.22;
+    transform: scale(0.9);
   }
   50% {
     opacity: 1;
-    transform: scale(1);
+    transform: scale(1.05);
   }
 }
 @keyframes nodeGlow {
   0%,
   100% {
-    opacity: 0.65;
+    opacity: 0.55;
   }
   50% {
     opacity: 1;
-    filter: drop-shadow(0 0 5px white);
+    filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.85));
+  }
+}
+@keyframes corePulse {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+@keyframes auraBreathe {
+  0%,
+  100% {
+    opacity: 0.25;
+    transform: scale(0.92);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.08);
+  }
+}
+@keyframes traceBlink {
+  0%,
+  100% {
+    opacity: 0.25;
+  }
+  50% {
+    opacity: 0.95;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nano-logo-animated .logo-frame,
+  .nano-logo-animated .logo-trace,
+  .nano-logo-animated .logo-aura,
+  .nano-logo-animated .logo-wave,
+  .nano-logo-animated .logo-node,
+  .nano-logo-animated .logo-core {
+    animation: none !important;
+    opacity: 1 !important;
+    filter: none !important;
+    transform: none !important;
+    stroke-dashoffset: 0 !important;
   }
 }
 

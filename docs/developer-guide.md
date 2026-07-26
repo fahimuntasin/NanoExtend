@@ -4,7 +4,7 @@
 
 - `src/`, `include/`, `partitions/`: firmware
 - `assets/web/`: embedded device dashboard
-- `website/`: React + Tailwind Cloudflare Pages site and installer
+- `website/`: React + Tailwind GitHub Pages site and installer
 - `api/openapi.yaml`: API contract
 - `.github/workflows/`: CI, release, and deployment
 - `docs/`: user and architecture documentation

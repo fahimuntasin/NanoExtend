@@ -23,14 +23,14 @@ Typical embedded networking projects stop at a serial console and a working pack
 - **Local-first UX:** responsive black-and-white dashboard, WebSocket telemetry
 - **Safe lifecycle:** checksummed settings, backup/restore, factory reset, crash diagnostics
 - **Verified OTA:** SHA-256 uploads, equal dual slots, stable-boot confirmation
-- **Five-minute installer:** React/Tailwind Cloudflare site with Web Serial flashing
+- **Five-minute installer:** React/Tailwind GitHub Pages site with Web Serial flashing
 - **Open ecosystem:** OpenAPI, CI/CD, release artifacts, security and contribution policies
 
 ## Install in five minutes
 
 ### Browser installer
 
-Open the NanoExtend website in Chrome or Edge over HTTPS, select **Connect and install**, choose the ESP32 serial port, and wait for verification. The installer detects the chip and validates the firmware SHA-256 before flashing.
+Open [https://fahimuntasin.github.io/NanoExtend/](https://fahimuntasin.github.io/NanoExtend/) in Chrome or Edge over HTTPS, select **Connect and install**, choose the ESP32 serial port, and wait for verification. The installer detects the chip and validates the firmware SHA-256 before flashing.
 
 ### PlatformIO
 
@@ -78,7 +78,7 @@ partitions/           4MB dual-OTA layout
 website/              React + Tailwind landing site and Web Serial installer
 api/openapi.yaml      versioned device API contract
 docs/                 user, security, OTA, architecture, developer docs
-.github/workflows/     CI, semantic release artifacts, Cloudflare Pages
+.github/workflows/     CI, semantic release artifacts, GitHub Pages
 brand/                original NanoExtend visual identity
 ```
 
@@ -118,7 +118,7 @@ npm run typecheck
 npm run build
 ```
 
-Release tags (`vX.Y.Z`) produce factory, OTA, ELF, SHA256SUMS, and manifest assets. Cloudflare Pages deployment requires `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, and optional `CLOUDFLARE_PROJECT_NAME` repository configuration.
+Release tags (`vX.Y.Z`) produce factory, OTA, ELF, SHA256SUMS, and manifest assets. The landing site and browser installer deploy automatically to GitHub Pages at [fahimuntasin.github.io/NanoExtend](https://fahimuntasin.github.io/NanoExtend/).
 
 ## Documentation
 

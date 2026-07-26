@@ -8,5 +8,7 @@ __pycache__/
 website/node_modules/
 website/dist/
 website/public/firmware/*.bin
-website/.wrangler/
 .DS_Store
+
+website/public/docs/
+website/public/api/
