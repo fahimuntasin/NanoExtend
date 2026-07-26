@@ -371,7 +371,7 @@ function App() {
 
         <section className="section installer-section" id="usb-setup">
           <div className="section-heading">
-            <span className="eyebrow">No phone required</span>
+            <span className="eyebrow">No phone required · build 1.0.3</span>
             <h2>USB cable. Full dashboard.</h2>
             <p>
               SoftAP-style Home, Scan, Clients, Settings, System, and Logs —

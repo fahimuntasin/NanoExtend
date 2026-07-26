@@ -324,17 +324,21 @@ function UsbSetup() {
 
       // CH340 toggles DTR/RTS on open and reboots the ESP — wait for SerialAdmin.
       setMessage("USB open — waiting for NanoExtend to boot…");
-      await new Promise((r) => window.setTimeout(r, 2800));
+      await new Promise((r) => window.setTimeout(r, 4000));
+      bufferRef.current = "";
+      // Nudge the UART and drop any bootloader noise still in flight.
+      await writerRef.current.write(new TextEncoder().encode("\n\n"));
+      await new Promise((r) => window.setTimeout(r, 200));
       bufferRef.current = "";
 
       let hello: Record<string, unknown> | null = null;
-      for (let attempt = 0; attempt < 16; attempt++) {
-        setMessage(`Waiting for firmware reply… (${attempt + 1}/16)`);
+      for (let attempt = 0; attempt < 20; attempt++) {
+        setMessage(`Waiting for firmware reply… (${attempt + 1}/20)`);
         try {
-          hello = await request("hello", {}, 2500);
+          hello = await request("hello", {}, 3000);
           break;
         } catch {
-          await new Promise((r) => window.setTimeout(r, 500));
+          await new Promise((r) => window.setTimeout(r, 600));
         }
       }
       if (!hello) {
