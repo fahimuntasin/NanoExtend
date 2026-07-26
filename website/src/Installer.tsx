@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { Check, Cpu, LoaderCircle, Usb, Wifi } from "lucide-react";
 import { ESPLoader, Transport, type IEspLoaderTerminal } from "esptool-js";
+import { requestEspSerialPort, SERIAL_PORT_HINT } from "./serialPorts";
 
 type InstallState =
   | "idle"
@@ -50,9 +51,9 @@ function Installer() {
     let transport: Transport | undefined;
     try {
       setState("connecting");
-      setMessage("Select the ESP32 USB serial port.");
+      setMessage(SERIAL_PORT_HINT);
       setProgress(4);
-      const port = await navigator.serial.requestPort();
+      const port = await requestEspSerialPort();
       transport = new Transport(port, false);
 
       const terminal: IEspLoaderTerminal = {

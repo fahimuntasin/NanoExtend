@@ -792,6 +792,27 @@ input {
 .usb-setup-shell {
   margin-top: 0;
 }
+.usb-port-hint {
+  display: grid;
+  gap: 6px;
+  margin: 0 0 16px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.03);
+}
+.usb-port-hint strong {
+  font-size: 13px;
+}
+.usb-port-hint span {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+.usb-port-hint em {
+  font-style: normal;
+  color: #ddd;
+}
 .usb-actions {
   display: flex;
   flex-wrap: wrap;

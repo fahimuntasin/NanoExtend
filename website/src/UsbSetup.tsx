@@ -8,6 +8,7 @@ import {
   Usb,
   Wifi,
 } from "lucide-react";
+import { requestEspSerialPort, SERIAL_PORT_HINT } from "./serialPorts";
 
 type ConnState = "idle" | "connecting" | "ready" | "error";
 
@@ -226,11 +227,11 @@ function UsbSetup() {
       return;
     }
     setConn("connecting");
-    setMessage("Select the ESP32 USB serial port…");
+    setMessage(SERIAL_PORT_HINT);
     setBusy(true);
     try {
       await cleanupPort();
-      const port = await navigator.serial.requestPort();
+      const port = await requestEspSerialPort();
       await port.open({ baudRate: 115200 });
       portRef.current = port;
       bufferRef.current = "";
@@ -350,6 +351,14 @@ function UsbSetup() {
       <p className={conn === "error" ? "installer-error" : "installer-message"}>
         {message}
       </p>
+
+      <aside className="usb-port-hint" aria-label="Serial port tip">
+        <strong>Which port?</strong>
+        <span>
+          Pick <em>USB Serial</em> / <em>CH340</em> / <em>CP210x</em>. Skip{" "}
+          <em>ttyS0–ttyS15</em> — those belong to the PC, not the ESP32.
+        </span>
+      </aside>
 
       <div className="usb-actions">
         {conn !== "ready" ? (

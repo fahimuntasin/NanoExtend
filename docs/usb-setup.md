@@ -23,7 +23,7 @@ The SoftAP (`NanoExtend` / your AP password) still runs. Join it from any Wi-Fi 
 
 ## Protocol (for tools)
 
-Baud: **115200**. Line-oriented JSON with a fixed prefix so logs do not collide.
+Baud: **115200**. Prefer the USB-UART bridge (CH340 / CP210x / FTDI). On Linux, Chrome may also list motherboard ports like `ttyS0` — those are **not** the ESP32. The website filters the chooser to common USB serial vendor IDs.
 
 | Direction | Format |
 |-----------|--------|
