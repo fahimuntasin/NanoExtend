@@ -322,25 +322,47 @@ function UsbSetup() {
         port.writable as WritableStream<Uint8Array>
       ).getWriter();
 
+      // CH340 toggles DTR/RTS on open and reboots the ESP — wait for SerialAdmin.
+      setMessage("USB open — waiting for NanoExtend to boot…");
+      await new Promise((r) => window.setTimeout(r, 2800));
+      bufferRef.current = "";
+
       let hello: Record<string, unknown> | null = null;
-      for (let attempt = 0; attempt < 10; attempt++) {
+      for (let attempt = 0; attempt < 16; attempt++) {
+        setMessage(`Waiting for firmware reply… (${attempt + 1}/16)`);
         try {
-          hello = await request("hello", {}, 2000);
+          hello = await request("hello", {}, 2500);
           break;
         } catch {
-          await new Promise((r) => window.setTimeout(r, 400));
+          await new Promise((r) => window.setTimeout(r, 500));
         }
       }
       if (!hello) {
-        throw new Error("No reply from NanoExtend. Flash firmware 1.0.3+ first.");
+        throw new Error(
+          "No reply from NanoExtend. Unplug/replug USB, close other serial monitors, hard-refresh this page, then pick CH340/USB Serial (not ttyS*).",
+        );
       }
 
       setFw(String(hello.fw ?? ""));
       setConn("ready");
       setMessage("USB dashboard live — same controls as SoftAP, over the cable.");
-      await refreshStatus();
-      await refreshScan(true);
-      await refreshSettings();
+      try {
+        await refreshStatus();
+      } catch {
+        /* status can retry via poll */
+      }
+      try {
+        await refreshSettings();
+      } catch {
+        /* settings tab can reload */
+      }
+      try {
+        await refreshScan(true);
+      } catch {
+        setMessage(
+          "USB dashboard live. Wi-Fi scan is still warming up — open the Scan tab and refresh.",
+        );
+      }
 
       pollRef.current = window.setInterval(() => {
         void refreshStatus().catch(() => undefined);
